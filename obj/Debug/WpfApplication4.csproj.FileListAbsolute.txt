@@ -28,3 +28,6 @@ C:\Users\valentina\Desktop\WpfApplication4\WpfApplication4\obj\Debug\WpfApplicat
 C:\Users\valentina\Documents\Visual Studio 2012\Projects\WpfApplication4\bin\Debug\WpfApplication4.exe.config
 C:\Users\valentina\Documents\Visual Studio 2012\Projects\WpfApplication4\obj\Debug\WpfApplication4.exe
 C:\Users\valentina\Documents\Visual Studio 2012\Projects\WpfApplication4\obj\Debug\WpfApplication4.pdb
+C:\Users\Dominick Madden\Documents\tangibletouch\bin\Debug\WpfApplication4.exe.config
+C:\Users\Dominick Madden\Documents\tangibletouch\obj\Debug\WpfApplication4.exe
+C:\Users\Dominick Madden\Documents\tangibletouch\obj\Debug\WpfApplication4.pdb

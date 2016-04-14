@@ -25,6 +25,7 @@ namespace WpfTouchFrameSample
   
         public MainWindow()
         {
+            //TESTTESTESTESTE
             InitializeComponent();
             System.Windows.Input.Touch.FrameReported += new TouchFrameEventHandler(Touch_FrameReported);
 
