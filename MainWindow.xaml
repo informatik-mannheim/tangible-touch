@@ -1,0 +1,12 @@
+﻿<Window x:Class="WpfTouchFrameSample.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="MainWindow" Height="525" Width="525">
+    <Grid x:Name="grid1">
+        <Canvas x:Name="canvas1"
+                Width="500" Height="500"
+                Background="White" />
+        <RichTextBox x:Name="Nummer" FontSize="300" 
+                 Background="Tomato" Margin="257,10,10,241"/>
+    </Grid>
+</Window>

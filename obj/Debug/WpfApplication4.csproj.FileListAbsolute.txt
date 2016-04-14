@@ -1,0 +1,30 @@
+C:\Users\valentina\Documents\Visual Studio 2012\Projects\WpfApplication4\WpfApplication4\bin\Debug\WpfApplication4.exe.config
+C:\Users\valentina\Documents\Visual Studio 2012\Projects\WpfApplication4\WpfApplication4\bin\Debug\WpfApplication4.exe
+C:\Users\valentina\Documents\Visual Studio 2012\Projects\WpfApplication4\WpfApplication4\bin\Debug\WpfApplication4.pdb
+C:\Users\valentina\Documents\Visual Studio 2012\Projects\WpfApplication4\WpfApplication4\obj\Debug\MainWindow.baml
+C:\Users\valentina\Documents\Visual Studio 2012\Projects\WpfApplication4\WpfApplication4\obj\Debug\MainWindow.g.cs
+C:\Users\valentina\Documents\Visual Studio 2012\Projects\WpfApplication4\WpfApplication4\obj\Debug\App.g.cs
+C:\Users\valentina\Documents\Visual Studio 2012\Projects\WpfApplication4\WpfApplication4\obj\Debug\WpfApplication4_MarkupCompile.cache
+C:\Users\valentina\Documents\Visual Studio 2012\Projects\WpfApplication4\WpfApplication4\obj\Debug\WpfApplication4.g.resources
+C:\Users\valentina\Documents\Visual Studio 2012\Projects\WpfApplication4\WpfApplication4\obj\Debug\WpfApplication4.Properties.Resources.resources
+C:\Users\valentina\Documents\Visual Studio 2012\Projects\WpfApplication4\WpfApplication4\obj\Debug\WpfApplication4.csproj.GenerateResource.Cache
+C:\Users\valentina\Documents\Visual Studio 2012\Projects\WpfApplication4\WpfApplication4\obj\Debug\WpfApplication4.exe
+C:\Users\valentina\Documents\Visual Studio 2012\Projects\WpfApplication4\WpfApplication4\obj\Debug\WpfApplication4.pdb
+C:\Users\valentina\Documents\Visual Studio 2012\Projects\WpfApplication4\WpfApplication4\obj\Debug\WpfApplication4.csprojResolveAssemblyReference.cache
+C:\Users\valentina\Desktop\WpfApplication4\WpfApplication4\bin\Debug\WpfApplication4.exe.config
+C:\Users\valentina\Desktop\WpfApplication4\WpfApplication4\bin\Debug\WpfApplication4.exe
+C:\Users\valentina\Desktop\WpfApplication4\WpfApplication4\bin\Debug\WpfApplication4.pdb
+C:\Users\valentina\Desktop\WpfApplication4\WpfApplication4\bin\Debug\unityengine.dll
+C:\Users\valentina\Desktop\WpfApplication4\WpfApplication4\obj\Debug\MainWindow.baml
+C:\Users\valentina\Desktop\WpfApplication4\WpfApplication4\obj\Debug\MainWindow.g.cs
+C:\Users\valentina\Desktop\WpfApplication4\WpfApplication4\obj\Debug\App.g.cs
+C:\Users\valentina\Desktop\WpfApplication4\WpfApplication4\obj\Debug\WpfApplication4_MarkupCompile.cache
+C:\Users\valentina\Desktop\WpfApplication4\WpfApplication4\obj\Debug\WpfApplication4.g.resources
+C:\Users\valentina\Desktop\WpfApplication4\WpfApplication4\obj\Debug\WpfApplication4.Properties.Resources.resources
+C:\Users\valentina\Desktop\WpfApplication4\WpfApplication4\obj\Debug\WpfApplication4.csproj.GenerateResource.Cache
+C:\Users\valentina\Desktop\WpfApplication4\WpfApplication4\obj\Debug\WpfApplication4.exe
+C:\Users\valentina\Desktop\WpfApplication4\WpfApplication4\obj\Debug\WpfApplication4.pdb
+C:\Users\valentina\Desktop\WpfApplication4\WpfApplication4\obj\Debug\WpfApplication4.csprojResolveAssemblyReference.cache
+C:\Users\valentina\Documents\Visual Studio 2012\Projects\WpfApplication4\bin\Debug\WpfApplication4.exe.config
+C:\Users\valentina\Documents\Visual Studio 2012\Projects\WpfApplication4\obj\Debug\WpfApplication4.exe
+C:\Users\valentina\Documents\Visual Studio 2012\Projects\WpfApplication4\obj\Debug\WpfApplication4.pdb
