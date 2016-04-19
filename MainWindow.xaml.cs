@@ -33,6 +33,8 @@ namespace WpfTouchFrameSample
         
             Nummer.Dispatcher.Invoke(new UpdateTextCallback(this.UpdateText), touches.ToString());
 
+            xy.AppendText(touches.ToString() + " X " + _touchPoint.Position.X.ToString() + " Y " + _touchPoint.Position.Y.ToString() +"\n");
+
             e.Handled = true;
         }
 
@@ -61,6 +63,7 @@ namespace WpfTouchFrameSample
         {
             Nummer.Document.Blocks.Clear();
             Nummer.AppendText(message);
+            xy.AppendText("");
         }
     }
 }
