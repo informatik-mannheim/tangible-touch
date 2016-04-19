@@ -63,7 +63,7 @@ namespace WpfTouchFrameSample
         {
             Nummer.Document.Blocks.Clear();
             Nummer.AppendText(message);
-            xy.AppendText("");
+           // xy.Document.Blocks.Clear();
         }
     }
 }
