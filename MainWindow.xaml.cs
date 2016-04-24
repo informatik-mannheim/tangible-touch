@@ -16,9 +16,11 @@ namespace WpfTouchFrameSample
 
         // private ArrayList vectorList = new ArrayList();
         // map with all point objects
-        private Dictionary<int, Point> pointMap = new Dictionary<int, Point>();
+        // private Dictionary<int, Point> pointMap = new Dictionary<int, Point>();
+        private Dictionary<int, TouchPoint> touchPointMap = new Dictionary<int, TouchPoint>();
+
         // map with all distances between the points
-        private Dictionary<int, double> distanceMap = new Dictionary<int, double>();
+        private Dictionary<Array, double> distanceMap = new Dictionary<Array, double>();
 
 
         public MainWindow()
@@ -39,33 +41,61 @@ namespace WpfTouchFrameSample
             _touchPoint = e.TouchDevice.GetTouchPoint(this.canvas1);
 
             // retrieve coordination of single point
-            Point point = new Point(_touchPoint.Position.X, _touchPoint.Position.Y);
+            //Point point = new Point(_touchPoint.Position.X, _touchPoint.Position.Y);
 
             // add point to map
-            pointMap.Add(countTouches, point);
+            //pointMap.Add(countTouches, point);
+            touchPointMap.Add(countTouches, _touchPoint);
 
             // only calculate distance, if there is more than 1 touch point
-            if (countTouches > 0)
+            if (countTouches > 1)
             {
                 // get one touch point
                 // then calculate distance with the other touch points
+                // create maps for touch points and distances
                 for (int i = 0; i < countTouches; i++)
                 {
                     for (int j = i + 1; j < countTouches; j++)
                     {
-                        // add distance to map
-                        distanceMap.Add(countDistances, calcDistance(pointMap[i], pointMap[j]));
 
-                        // count touch point
-                        countTouches++;
+                        // declare single-dimensional array for index i, j
+                        int[] aIndex = new int[2];
+
+                        // save index i, j as values
+                        // later compare with keys of touch point map
+                        aIndex[0] = i;
+                        aIndex[1] = j;
+
+                        // add distance to map
+                        // {array} aIndex as key
+                        distanceMap.Add(aIndex, calcDistance(touchPointMap[i], touchPointMap[j]));
                     }
                 }
+                // here to continue... 
+
             }
+            else
+            {
+                // only one touch point...
+            }
+
+            // count touch point, after calculating distance
+            countTouches++;
 
             Nummer.Dispatcher.Invoke(new UpdateTextCallback(this.UpdateText), countTouches.ToString());
 
             xy.AppendText(countTouches.ToString() + " X " + _touchPoint.Position.X.ToString() + " Y " + _touchPoint.Position.Y.ToString() + "\n");
 
+
+            // LOG distances
+            Console.WriteLine("OnTouchDown...");
+            
+            foreach (var key in distanceMap)
+            {
+                int counter = 1;
+                Console.WriteLine("Distance " + counter + ": " + distanceMap[key.Key]);
+                counter++;
+            }
             e.Handled = true;
         }
 
@@ -75,26 +105,57 @@ namespace WpfTouchFrameSample
 
             if (el == null) return;
 
-            TouchPoint tp = e.GetTouchPoint(el);
+            // get touch point
+            TouchPoint touchPoint = e.GetTouchPoint(el);
+
+            // get xy coordinates of touch point
+            Point point = new Point(touchPoint.Position.X, touchPoint.Position.Y);
+
             Rect bounds = new Rect(new Point(0, 0), el.RenderSize);
 
-
-            foreach (var key in pointMap)
+            // remove touch point from point map
+            foreach (var key in touchPointMap)
             {
-                // key.Value is the actual value
-                // here Point object
-                if (key.Value.Equals(tp))
+                if (touchPointMap.ContainsKey(key.Key))
                 {
-                    // key.Key is the actual key
-                    // remove touch point
-                    distanceMap.Remove(key.Key);
+                    if (touchPointMap[key.Key].Equals(touchPoint))
+                    {
+                        touchPointMap.Remove(key.Key);
+
+                        // remove distance from distance map
+                        // {array} aKey array with indexes of touch points
+                        foreach (var aKey in distanceMap)
+                        {
+                            if (distanceMap.ContainsKey(aKey.Key))
+                            {
+   
+                                for (int i = 0; i < aKey.Key.Length; i++)
+                                {
+                                    if (key.Key == (int)aKey.Key.GetValue(i))
+                                    {
+                                        distanceMap.Remove(aKey.Key);
+                                    }
+                                }
+                            }
+                        }
+                    }
                 }
             }
 
-            if (bounds.Contains(tp.Position))
+            if (bounds.Contains(touchPoint.Position))
             {
                 countTouches--;
                 Nummer.Dispatcher.Invoke(new UpdateTextCallback(this.UpdateText), countTouches.ToString());
+            }
+
+            // LOG distances
+            Console.WriteLine("OnTouchUp...");
+
+            foreach (var key in distanceMap)
+            {
+                int counter = 1;
+                Console.WriteLine("Distance " + counter + ": " + distanceMap[key.Key]);
+                counter++;
             }
 
             el.ReleaseTouchCapture(e.TouchDevice);
@@ -112,7 +173,7 @@ namespace WpfTouchFrameSample
 
         // Function calculates distance between two touch points
         // returns {double} distance
-        private double calcDistance(Point p1, Point p2)
+        private double calcDistance(TouchPoint p1, TouchPoint p2)
         {
             countDistances++;
             return Math.Sqrt(Math.Pow(p2.X - p1.X, 2) + Math.Pow(p2.Y - p1.Y, 2));
