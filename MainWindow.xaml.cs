@@ -176,7 +176,7 @@ namespace WpfTouchFrameSample
         private double calcDistance(TouchPoint p1, TouchPoint p2)
         {
             countDistances++;
-            return Math.Sqrt(Math.Pow(p2.X - p1.X, 2) + Math.Pow(p2.Y - p1.Y, 2));
+            return Math.Sqrt(Math.Pow(p2.Position.X - p1.Position.X, 2) + Math.Pow(p2.Position.Y - p1.Position.Y, 2));
         }
     }
 }
