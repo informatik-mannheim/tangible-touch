@@ -89,10 +89,11 @@ namespace WpfTouchFrameSample
 
             // LOG distances
             Console.WriteLine("OnTouchDown...");
-            
+
+            int counter = 1;
             foreach (var key in distanceMap)
             {
-                int counter = 1;
+                
                 Console.WriteLine("Distance " + counter + ": " + distanceMap[key.Key]);
                 counter++;
             }
@@ -121,7 +122,7 @@ namespace WpfTouchFrameSample
                     if (touchPointMap[key.Key].Equals(touchPoint))
                     {
                         touchPointMap.Remove(key.Key);
-
+                        countTouches--;
                         // remove distance from distance map
                         // {array} aKey array with indexes of touch points
                         foreach (var aKey in distanceMap)
@@ -144,16 +145,16 @@ namespace WpfTouchFrameSample
 
             if (bounds.Contains(touchPoint.Position))
             {
-                countTouches--;
+               // countTouches--;
                 Nummer.Dispatcher.Invoke(new UpdateTextCallback(this.UpdateText), countTouches.ToString());
             }
 
             // LOG distances
             Console.WriteLine("OnTouchUp...");
 
+            int counter = 1;
             foreach (var key in distanceMap)
             {
-                int counter = 1;
                 Console.WriteLine("Distance " + counter + ": " + distanceMap[key.Key]);
                 counter++;
             }
