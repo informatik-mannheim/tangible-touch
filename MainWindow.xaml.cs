@@ -10,27 +10,28 @@ namespace WpfTouchFrameSample
 {
     public partial class MainWindow : Window
     {
-        private int countTouches = 0;
+        private int countTouches = 1;
         private int countDistances = 0;
-        private double[,] position = new double[8, 2];
-
+       // private double[,] position = new double[8, 2];
         // private ArrayList vectorList = new ArrayList();
+        
         // map with all point objects
         // private Dictionary<int, Point> pointMap = new Dictionary<int, Point>();
+        
         private Dictionary<int, TouchPoint> touchPointMap = new Dictionary<int, TouchPoint>();
 
         // map with all distances between the points
         private Dictionary<Array, double> distanceMap = new Dictionary<Array, double>();
-
-
+        
+        public delegate void UpdateTextCallback(string text);
+        TouchPoint _touchPoint;
+        
         public MainWindow()
         {
             InitializeComponent();
         }
 
-        public delegate void UpdateTextCallback(string text);
-
-        TouchPoint _touchPoint;
+      
 
         void OnTouchDown(object sender, TouchEventArgs e)
         {
@@ -46,18 +47,23 @@ namespace WpfTouchFrameSample
             // add point to map
             //pointMap.Add(countTouches, point);
             touchPointMap.Add(countTouches, _touchPoint);
-
+            
             // only calculate distance, if there is more than 1 touch point
             if (countTouches > 1)
             {
+                Console.WriteLine("Point " + countTouches);
                 // get one touch point
                 // then calculate distance with the other touch points
                 // create maps for touch points and distances
-                for (int i = 0; i < countTouches; i++)
+                for (int i = 1; i < countTouches; i++)
                 {
-                    for (int j = i + 1; j < countTouches; j++)
-                    {
+                    // LOG distances
+                    Console.WriteLine("point " + countTouches +  "i :" + i );
 
+                    for (int j = i + 1 ; j <= countTouches; j++)
+                    {
+                        // LOG distances
+                        Console.WriteLine("i :" + i + "j :" + j );
                         // declare single-dimensional array for index i, j
                         int[] aIndex = new int[2];
 
@@ -65,7 +71,7 @@ namespace WpfTouchFrameSample
                         // later compare with keys of touch point map
                         aIndex[0] = i;
                         aIndex[1] = j;
-
+                      
                         // add distance to map
                         // {array} aIndex as key
                         distanceMap.Add(aIndex, calcDistance(touchPointMap[i], touchPointMap[j]));
@@ -79,15 +85,14 @@ namespace WpfTouchFrameSample
                 // only one touch point...
             }
 
+            Console.WriteLine("OnTouchDown..." +countTouches);
+            Nummer.Dispatcher.Invoke(new UpdateTextCallback(this.UpdateText), countTouches.ToString());
+
             // count touch point, after calculating distance
             countTouches++;
 
-            Nummer.Dispatcher.Invoke(new UpdateTextCallback(this.UpdateText), countTouches.ToString());
-
             xy.AppendText(countTouches.ToString() + " X " + _touchPoint.Position.X.ToString() + " Y " + _touchPoint.Position.Y.ToString() + "\n");
 
-
-            // LOG distances
             Console.WriteLine("OnTouchDown...");
 
             int counter = 1;
@@ -117,12 +122,16 @@ namespace WpfTouchFrameSample
             // remove touch point from point map
             foreach (var key in touchPointMap)
             {
+                Console.WriteLine("Teste 1..." + key);
                 if (touchPointMap.ContainsKey(key.Key))
                 {
-                    if (touchPointMap[key.Key].Equals(touchPoint))
+                    Console.WriteLine("Teste 2...");
+                    if (touchPointMap[key.Key].Position.Equals(touchPoint.Position))
                     {
+                        Console.WriteLine("Teste 3...");
                         touchPointMap.Remove(key.Key);
                         countTouches--;
+
                         // remove distance from distance map
                         // {array} aKey array with indexes of touch points
                         foreach (var aKey in distanceMap)
@@ -135,6 +144,12 @@ namespace WpfTouchFrameSample
                                     if (key.Key == (int)aKey.Key.GetValue(i))
                                     {
                                         distanceMap.Remove(aKey.Key);
+
+                                        if (distanceMap.Count == 0) 
+                                        {
+                                            return;
+                                        }
+
                                     }
                                 }
                             }
@@ -145,12 +160,12 @@ namespace WpfTouchFrameSample
 
             if (bounds.Contains(touchPoint.Position))
             {
-               // countTouches--;
+                //countTouches--;
+                Console.WriteLine("OnTouchUP..." + countTouches);
                 Nummer.Dispatcher.Invoke(new UpdateTextCallback(this.UpdateText), countTouches.ToString());
             }
 
-            // LOG distances
-            Console.WriteLine("OnTouchUp...");
+            /*Console.WriteLine("OnTouchUp...");
 
             int counter = 1;
             foreach (var key in distanceMap)
@@ -158,12 +173,22 @@ namespace WpfTouchFrameSample
                 Console.WriteLine("Distance " + counter + ": " + distanceMap[key.Key]);
                 counter++;
             }
-
+            */
             el.ReleaseTouchCapture(e.TouchDevice);
 
             e.Handled = true;
         }
 
+        void OnTouchMove(object sender, TouchEventArgs e)
+        {
+            FrameworkElement element = sender as FrameworkElement;
+            if (element == null) return;
+
+            element.CaptureTouch(e.TouchDevice);
+            _touchPoint = e.TouchDevice.GetTouchPoint(this.canvas1);
+            Console.WriteLine("test");
+
+        }
         private void UpdateText(string message)
         {
             // hier evtl. den calculator aufrufen
