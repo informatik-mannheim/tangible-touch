@@ -9,7 +9,7 @@
                 />
         <RichTextBox x:Name="Nummer" FontSize="100" 
                  Background="Tomato" Margin="2,0,8,10" Width="200" Height="200"/>
-        <RichTextBox x:Name="xy" FontSize="20" Width="200" Height="200"
-                 Background="Azure" Margin="256,0,-246,10"/>
+        <RichTextBox x:Name="xy" FontSize="20"
+                 Background="Azure" Margin="518,272,-66,150"/>
     </Grid>
 </Window>

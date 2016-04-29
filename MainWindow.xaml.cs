@@ -81,6 +81,8 @@ namespace WpfTouchFrameSample
                         {
                             // if it is not add to distanceMap 
                             Console.WriteLine("distance in distanceMap     " + aIndex + distance);
+                            xy.AppendText("distance " + distance + "\n");
+
                             // add distance to map
                             distanceMap.Add(aIndex, distance);
                         }
@@ -205,6 +207,7 @@ namespace WpfTouchFrameSample
         {
             countDistances++;
             return Math.Sqrt(Math.Pow(p2.Position.X - p1.Position.X, 2) + Math.Pow(p2.Position.Y - p1.Position.Y, 2));
+           
         }
     }
 }
