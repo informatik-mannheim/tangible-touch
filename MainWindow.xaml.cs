@@ -21,10 +21,7 @@ namespace WpfTouchFrameSample
         private Dictionary<int, TouchPoint> touchPointMap = new Dictionary<int, TouchPoint>();
 
         // map with all distances between the points
-        private Dictionary<int, double> distanceMap = new Dictionary<int, double>();
-
-        // map with index of distances
-        private Dictionary<int, Array> mIndex = new Dictionary<int, Array>();
+        private Dictionary<Array, double> distanceMap = new Dictionary<Array, double>();
 
         public delegate void UpdateTextCallback(string text);
         TouchPoint _touchPoint;
@@ -33,8 +30,6 @@ namespace WpfTouchFrameSample
         {
             InitializeComponent();
         }
-
-
 
         void OnTouchDown(object sender, TouchEventArgs e)
         {
@@ -74,14 +69,21 @@ namespace WpfTouchFrameSample
                         // later compare with keys of touch point map
                         aIndex[0] = i;
                         aIndex[1] = j;
-
-                        // add distance to map
-                        // {int} HashCode of aIndex as key
-                        distanceMap.Add(aIndex.GetHashCode(), calcDistance(touchPointMap[i], touchPointMap[j]));
-
-                        // add {array} aIndex to map 
-                        // {int} countDistances as key
-                        mIndex.Add(countDistances, aIndex);
+                
+                        double distance = calcDistance(touchPointMap[i], touchPointMap[j]);   
+                        Console.WriteLine("distance     " +distance);
+                        // check if distance is in distanceMap
+                        if (distanceMap.ContainsValue(distance))
+                        {
+                            Console.WriteLine("return     " );
+                        }
+                        else
+                        {
+                            // if it is not add to distanceMap 
+                            Console.WriteLine("distance in distanceMap     " + aIndex + distance);
+                            // add distance to map
+                            distanceMap.Add(aIndex, distance);
+                        }
                     }
                 }
                 // here to continue... 
@@ -94,12 +96,12 @@ namespace WpfTouchFrameSample
 
             Console.WriteLine("OnTouchDown..." + countTouches);
             Nummer.Dispatcher.Invoke(new UpdateTextCallback(this.UpdateText), countTouches.ToString());
+            xy.AppendText(countTouches.ToString() + " X " + _touchPoint.Position.X.ToString() + " Y " + _touchPoint.Position.Y.ToString() + "\n");
 
             // count touch point, after calculating distance
             countTouches++;
 
-            xy.AppendText(countTouches.ToString() + " X " + _touchPoint.Position.X.ToString() + " Y " + _touchPoint.Position.Y.ToString() + "\n");
-
+      
             Console.WriteLine("OnTouchDown...");
 
             int counter = 1;
@@ -121,65 +123,37 @@ namespace WpfTouchFrameSample
             // get touch point
             TouchPoint touchPoint = e.GetTouchPoint(el);
 
+            // get xy coordinates of touch point
+            Point point = new Point(touchPoint.Position.X, touchPoint.Position.Y);
+
             Rect bounds = new Rect(new Point(0, 0), el.RenderSize);
 
             // remove touch point from point map
-            // {int} key is the specific countTouches number of the touch point, which is saved in the map
             foreach (var key in touchPointMap)
             {
-                Console.WriteLine("Teste 1..." + key);
-                if (touchPointMap.ContainsKey(key.Key))
+               if (touchPointMap.ContainsKey(key.Key))
                 {
-                    Console.WriteLine("Teste 2...");
                     if (touchPointMap[key.Key].Position.Equals(touchPoint.Position))
                     {
-                        Console.WriteLine("Teste 3...");
                         touchPointMap.Remove(key.Key);
                         countTouches--;
 
                         // remove distance from distance map
-                        // {int} hashcode as the key of the distance map
-                        foreach (var hashCode in distanceMap)
+                        // {array} aKey array with indexes of touch points
+                        foreach (var aKey in distanceMap)
                         {
-                            if (distanceMap.ContainsKey(hashCode.Key))
+                            if (distanceMap.ContainsKey(aKey.Key))
                             {
-                                foreach (var iKey in mIndex)
-                                {
-                                    // check if hashCode {key} equals the hashCode of the {array} in mIndex[iKey.Key]
-                                    if (hashCode.Key.Equals(mIndex[iKey.Key].GetHashCode()))
-                                    {
-                                        // loop through the {array} in mIndex[iKey.Key] which is 2 elements long
-                                        for (int i = 0; i < mIndex[iKey.Key].Length; i++)
-                                        {
-                                            // get the element of the {array} in mIndex[iKey.Key]
-                                            // which is the saved index i,j in aIndex above
-                                            int element = (int)mIndex[iKey.Key].GetValue(i);
-
-                                            // if the {int} key  (the specific countTouches number of the touch point) equals the index in the array
-                                            // remove the distance
-                                            if (key.Key == element)
-                                            {
-                                                distanceMap.Remove(hashCode.Key);
-                                                countDistances--;
-                                            }
-                                        }
-                                    }
-                                }
-
-                                /*
                                 for (int i = 0; i < aKey.Key.Length; i++)
                                 {
                                     if (key.Key == (int)aKey.Key.GetValue(i))
                                     {
                                         distanceMap.Remove(aKey.Key);
-
-                                        if (distanceMap.Count == 0) 
-                                        {
-                                            return;
-                                        }
+                                        Console.WriteLine("OnTouchUP..." + aKey);
+                                        return;
 
                                     }
-                                }*/
+                                }
                             }
                         }
                     }
