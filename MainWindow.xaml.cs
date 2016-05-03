@@ -4,6 +4,7 @@ using System.Windows.Input;
 using System.Collections;
 using System.Collections.Generic;
 using WpfApplication4;
+using System.Windows.Forms;
 
 
 namespace WpfTouchFrameSample
@@ -38,6 +39,7 @@ namespace WpfTouchFrameSample
 
             element.CaptureTouch(e.TouchDevice);
             _touchPoint = e.TouchDevice.GetTouchPoint(this.canvas1);
+
 
             // retrieve coordination of single point
             //Point point = new Point(_touchPoint.Position.X, _touchPoint.Position.Y);
@@ -82,7 +84,7 @@ namespace WpfTouchFrameSample
                             // if it is not add to distanceMap 
                             Console.WriteLine("distance in distanceMap     " + aIndex + distance);
                             xy.AppendText("distance " + distance + "\n");
-
+                            
                             // add distance to map
                             distanceMap.Add(aIndex, distance);
                         }
@@ -206,6 +208,8 @@ namespace WpfTouchFrameSample
         private double calcDistance(TouchPoint p1, TouchPoint p2)
         {
             countDistances++;
+           // Graphics screen = new Graphics();
+            //double dpc = this.CreateGraphics().DpiX / 2.54; //Dots Per Centimeter
             return Math.Sqrt(Math.Pow(p2.Position.X - p1.Position.X, 2) + Math.Pow(p2.Position.Y - p1.Position.Y, 2));
            
         }
