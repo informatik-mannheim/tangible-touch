@@ -4,7 +4,7 @@
         Title="MainWindow" Height="1000" Width="1000">
     <Grid x:Name="grid1" Margin="0,0,258,216" TouchDown="OnTouchDown" TouchUp="OnTouchUp" IsManipulationEnabled="True" >
         <Canvas x:Name="canvas1"
-                 Height="800" Width="800"
+                 Height="800 px" Width="800 px"
                 Background="blue" Margin="106,38,-172,-84" VerticalAlignment="Top" 
                 />
         <RichTextBox x:Name="Nummer" FontSize="40" 
