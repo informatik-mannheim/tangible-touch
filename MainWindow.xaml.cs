@@ -47,6 +47,7 @@ namespace WpfTouchFrameSample
             // add point to map
             //pointMap.Add(countTouches, point);
             touchPointMap.Add(countTouches, _touchPoint);
+            // BUG an dieser Stelle !!!
 
             // only calculate distance, if there is more than 1 touch point
             if (countTouches > 1)
@@ -86,7 +87,7 @@ namespace WpfTouchFrameSample
                             // if it is not, add to distanceMap 
                             Console.WriteLine("aIndex UND distance in distanceMap hinzugefügt: " + aIndex + "    " + distance);
                             //xy.AppendText("distance " + distance + "\n");
-                            xamlDistances.AppendText("Distance between the Points " + distance + "\n");
+                            xamlDistances.AppendText("\n" + "Distance between the Points " + distance);
                        
                             // add distance to map
                             distanceMap.Add(aIndex, distance);
@@ -103,7 +104,7 @@ namespace WpfTouchFrameSample
 
             Console.WriteLine("OnTouchDown..." + countTouches);
             Number.Dispatcher.Invoke(new UpdateTextCallback(this.UpdateText), countTouches.ToString());
-            xy.AppendText("Point: " + countTouches.ToString() + "\n" + " X: " + _touchPoint.Position.X.ToString() + "\n" + " Y: " + _touchPoint.Position.Y.ToString() + "\n");
+            xy.AppendText("\n" + "Point: " + countTouches.ToString() + "\n" + " X: " + _touchPoint.Position.X.ToString() + "\n" + " Y: " + _touchPoint.Position.Y.ToString());
 
             // count touch point, after calculating distance
             countTouches++;
@@ -157,6 +158,9 @@ namespace WpfTouchFrameSample
                                     {
                                         distanceMap.Remove(aKey.Key);
                                         //Console.WriteLine("OnTouchUP..." + aKey);
+                                        xy.Document.Blocks.Clear();
+                                        xamlDistances.Document.Blocks.Clear();
+                                        Number.Document.Blocks.Clear();
                                         return;
 
                                     }
