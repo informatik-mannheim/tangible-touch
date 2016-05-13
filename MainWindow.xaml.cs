@@ -47,7 +47,8 @@ namespace WpfTouchFrameSample
             // add point to map
             //pointMap.Add(countTouches, point);
             touchPointMap.Add(countTouches, _touchPoint);
-            // BUG an dieser Stelle !!!
+            // BUG an dieser Stelle !!! 
+            // Exception: Ein Element mit dem gleichen Schlüssel wurde bereits hinzugefügt.
 
             // only calculate distance, if there is more than 1 touch point
             if (countTouches > 1)
@@ -158,9 +159,10 @@ namespace WpfTouchFrameSample
                                     {
                                         distanceMap.Remove(aKey.Key);
                                         //Console.WriteLine("OnTouchUP..." + aKey);
+                                        Number.Document.Blocks.Clear();
                                         xy.Document.Blocks.Clear();
                                         xamlDistances.Document.Blocks.Clear();
-                                        Number.Document.Blocks.Clear();
+                                       
                                         return;
 
                                     }
