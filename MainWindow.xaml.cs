@@ -105,7 +105,9 @@ namespace WpfTouchFrameSample
 
             Console.WriteLine("OnTouchDown..." + countTouches);
             Number.Dispatcher.Invoke(new UpdateTextCallback(this.UpdateText), countTouches.ToString());
-            xy.AppendText("\n" + "Point: " + countTouches.ToString() + "\n" + " X: " + _touchPoint.Position.X.ToString() + "\n" + " Y: " + _touchPoint.Position.Y.ToString());
+           // xy.AppendText("\n" + "Point: " + countTouches.ToString() + "\n" + " X: " + _touchPoint.Position.X.ToString() + "\n" + " Y: " + _touchPoint.Position.Y.ToString());
+            xy.AppendText("\n" + "Point: " + touchPointMap.Count + "\n" + " X: " + _touchPoint.Position.X.ToString() + "\n" + " Y: " + _touchPoint.Position.Y.ToString() );
+           
 
             // count touch point, after calculating distance
             countTouches++;
@@ -140,13 +142,15 @@ namespace WpfTouchFrameSample
             // remove touch point from point map
             foreach (var key in touchPointMap)
             {
+                countTouches = touchPointMap.Count;
+
                if (touchPointMap.ContainsKey(key.Key))
                 {
                     if (touchPointMap[key.Key].Position.Equals(touchPoint.Position))
                     {
-                        touchPointMap.Remove(key.Key);
-                        countTouches--;
-
+                       touchPointMap.Remove(key.Key);
+                            countTouches--;
+                  
                         // remove distance from distance map
                         // {array} aKey: array with indexes of touch points
                         foreach (var aKey in distanceMap)
@@ -161,14 +165,12 @@ namespace WpfTouchFrameSample
                                         //Console.WriteLine("OnTouchUP..." + aKey);
                                         Number.Document.Blocks.Clear();
                                         xy.Document.Blocks.Clear();
-                                        xamlDistances.Document.Blocks.Clear();
-                                       
-                                        return;
-
+                                        xamlDistances.Document.Blocks.Clear();                                       
                                     }
-                                } 
-                            }
-                        }return;
+                                }                            
+                             }
+                        }
+                       return;
                     }
                 }
             }
