@@ -3,11 +3,11 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="MainWindow" Height="1032" Width="2236" WindowState="Maximized">
     <Grid x:Name="grid1" Margin="0,0,190,156" TouchDown="OnTouchDown" TouchUp="OnTouchUp" IsManipulationEnabled="True" Width="59.77265033600158cm" Height="33.6221158140009cm" Background="LightGray">
-        <RichTextBox x:Name="Number" FontSize="40" 
+        <RichTextBox x:Name="xaml_number_of_touchpoints" FontSize="40" 
                  Background="Honeydew" Margin="658,254,1404.124,816.757" Height="200"/>
-        <RichTextBox x:Name="xy" FontSize="10"
+        <RichTextBox x:Name="xaml_xy_coordinates" FontSize="10"
                  Background="Beige" Width="200" Margin="928,54,1131.124,465.757"/>
-        <RichTextBox x:Name="xamlDistances" FontSize="10" 
+        <RichTextBox x:Name="xaml_distances" FontSize="10" 
                  Background="PowderBlue" Width="200" Margin="1140,54,919.124,465.757"/>
     </Grid>
 </Window>
