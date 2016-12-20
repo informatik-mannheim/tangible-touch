@@ -6,6 +6,8 @@ using System.Collections.Generic;
 using WpfApplication4;
 using System.Windows.Forms;
 using System.Drawing;
+using WpfApplication4.Geometry;
+using WpfApplication4.Geometry.Elements;
 
 namespace WpfTouchFrameSample
 {
@@ -14,38 +16,41 @@ namespace WpfTouchFrameSample
         private int countTouches = 0;
         private int countDistances = 0;
         private int threshold = 5;
-        // private double[,] position = new double[8, 2];
-        // private ArrayList vectorList = new ArrayList();
-
-        // map with all point objects
+        
         private Dictionary<int, TouchPoint> touchPointMap = new Dictionary<int, TouchPoint>();
         private List<TouchPoint> touchPointList = new List<TouchPoint>();
 
-        // map with all distances between the points
         private Dictionary<int, double> distanceMap = new Dictionary<int, double>();
         private List<Double> distanceList = new List<Double>();
 
         public delegate void UpdateTextCallback(string text);
-        TouchPoint _touchPoint;
 
         public MainWindow()
         {
             InitializeComponent();
+
+            var vectorA = new Vector2d(1, 1);
+            var vectorB = new Vector2d(1, 4);
+            var vectorC = new Vector2d(4, 1);
+            var vectorD = new Vector2d(2, 3);
+            var vectorE = new Vector2d(3, 2);
+
+            Vector2d[] vectors = new Vector2d[] { vectorA, vectorB, vectorC, vectorD, vectorE };
+
+            var box = MinimalBoundingBox.Calculate(vectors);
+            Console.WriteLine(box.ToString());
         }
 
         void OnTouchDown(object sender, TouchEventArgs e)
         {
             FrameworkElement element = sender as FrameworkElement;
 
-            // return if no touch element
-            if (element == null) return;
+            if (element == null) { return; }
 
             element.CaptureTouch(e.TouchDevice);
-            _touchPoint = e.TouchDevice.GetTouchPoint(this.grid1);
+            var touchPoint = new MyTouchpoint(e.TouchDevice.GetTouchPoint(this.grid1));
 
-            // update on touch down
-            updateOnTouchDown(_touchPoint);
-
+            updateOnTouchDown(touchPoint);
             e.Handled = true;
         }
 
@@ -56,11 +61,10 @@ namespace WpfTouchFrameSample
             xaml_distances.Document.Blocks.Clear();
 
             FrameworkElement element = sender as FrameworkElement;
-            // return if there is no element
-            if (element == null) return;
 
-            // get touch point
-            TouchPoint touchPoint = e.GetTouchPoint(element);
+            if (element == null) { return; }
+
+            var touchPoint = new MyTouchpoint(e.GetTouchPoint(element));
 
             Rect bounds = new Rect(new System.Windows.Point(0, 0), element.RenderSize);
 
@@ -70,42 +74,68 @@ namespace WpfTouchFrameSample
             e.Handled = true;
         }
 
-        void OnTouchMove(object sender, TouchEventArgs e)
+        private void updateOnTouchDown(MyTouchpoint touchPoint)
         {
-            FrameworkElement element = sender as FrameworkElement;
-            if (element == null) return;
+            countTouches++;
+            Console.WriteLine("OnTouchDown [" + touchPoint.ID.ToString() + "]");
 
-            element.CaptureTouch(e.TouchDevice);
-            _touchPoint = e.TouchDevice.GetTouchPoint(this.grid1);
-            Console.WriteLine("test");
+            // add new touchpoint to map
+            touchPointList.Add(touchPoint);
 
+            // calculate distance with minimum 2 touch points
+            calcDistance();
+
+            updateText();
         }
+
+        private void updateOnTouchUp(MyTouchpoint touchPointToRemove)
+        {
+            // find touch point and remove it
+            foreach (MyTouchpoint touchPoint in touchPointList)
+            {
+                if (touchPoint.Position.X - touchPointToRemove.Position.X <= threshold ||
+                    touchPoint.Position.Y - touchPointToRemove.Position.Y <= threshold ||
+                    touchPointToRemove.Position.X - touchPoint.Position.X <= threshold ||
+                    touchPointToRemove.Position.Y - touchPoint.Position.Y <= threshold)
+                {
+                    Console.WriteLine("OnTouchUp [" + touchPoint.ID.ToString() + "]");
+                    touchPointList.Remove(touchPoint);
+                    // decrease number of touch points
+                    countTouches--;
+
+                    // calculate distance with minimum 2 touch points
+                    calcDistance();
+
+                    updateText();
+
+                    // return because the foreach won't recognize the updated number of elements
+                    return;
+                }
+            }
+        }
+
         private void updateText()
         {
             xaml_xy_coordinates.Document.Blocks.Clear();
-            
 
-            int cTouchPoints = 0;
-
-            foreach (TouchPoint element in touchPointList)
+            foreach (MyTouchpoint touchPoint in touchPointList)
             {
-                cTouchPoints++;
                 xaml_number_of_touchpoints.Document.Blocks.Clear();
 
                 xaml_number_of_touchpoints.AppendText(touchPointList.Count.ToString());
-                xaml_xy_coordinates.AppendText("\n" + "Point: " + cTouchPoints + "\n" + " X: " + element.Position.X.ToString() + "\n" + " Y: " + element.Position.Y.ToString());
+                xaml_xy_coordinates.AppendText(touchPoint.ToString());
 
                 xaml_distances.Document.Blocks.Clear();
+
                 foreach (Double distance in distanceList)
                 {
                     xaml_distances.AppendText("\n" + "Distance between the Points " + distance);
                 }
-                Console.WriteLine(distanceList.Count);
+
+                //Console.WriteLine(distanceList.Count);
             }
         }
 
-        // Function calculates distance between two touch points
-        // returns {double} distance
         private void calcDistance()
         {
             // calculating the distances new with the touch points which left...
@@ -137,45 +167,27 @@ namespace WpfTouchFrameSample
 
         }
 
-        private void updateOnTouchDown(TouchPoint touchPoint)
+      
+
+        public class MyTouchpoint : TouchPoint
         {
-            // increase number of touch points
-            countTouches++;
-            Console.WriteLine("OnTouchDown..." + countTouches);
+            public DateTime Timestamp { get; private set; }
 
-            // add new touchpoint to map
-            touchPointList.Add(touchPoint);
-
-            // calculate distance with minimum 2 touch points
-            calcDistance();
-
-            updateText();
-        }
-
-        private void updateOnTouchUp(TouchPoint touchPoint)
-        {
-            // find touch point and remove it
-            foreach (TouchPoint element in touchPointList)
+            public MyTouchpoint(TouchPoint touchPoint)
+                : base(touchPoint.TouchDevice, touchPoint.Position, touchPoint.Bounds, touchPoint.Action)
             {
-                if (element.Position.X - touchPoint.Position.X <= threshold ||
-                    element.Position.Y - touchPoint.Position.Y <= threshold ||
-                    touchPoint.Position.X - element.Position.X <= threshold ||
-                    touchPoint.Position.Y - element.Position.Y <= threshold)
-                {
-                    touchPointList.Remove(element);
-                    // decrease number of touch points
-                    countTouches--;
-                    Console.WriteLine("OnTouchUp..." + countTouches);
+                Timestamp = DateTime.Now;
+                ID = Guid.NewGuid();
+            }
 
+            public override string ToString()
+            {
+                return "\n" + "Point: " + ID + "\n(" + Timestamp.ToString("MM/dd/yyyy hh:mm:ss.fff tt") + ")\n" + " X: " + Position.X.ToString() + "\n" + " Y: " + Position.Y.ToString();
+            }
 
-                    // calculate distance with minimum 2 touch points
-                    calcDistance();
-
-                    updateText();
-
-                    // return because the foreach won't recognize the updated number of elements
-                    return;
-                }
+            public Guid ID
+            {
+                get; private set;
             }
         }
     }
