@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using WpfApplication4;
 using System.Windows.Forms;
 using System.Drawing;
+using System.Text;
 using WpfApplication4.Geometry;
 using WpfApplication4.Geometry.Elements;
 
@@ -13,9 +14,11 @@ namespace WpfTouchFrameSample
 {
     public partial class MainWindow : Window
     {
+        private Object thisLock = new Object();
+
         private int countTouches = 0;
         private int countDistances = 0;
-        private int threshold = 5;
+        private int threshold = 15;
         
         private Dictionary<int, TouchPoint> touchPointMap = new Dictionary<int, TouchPoint>();
         private List<TouchPoint> touchPointList = new List<TouchPoint>();
@@ -28,7 +31,10 @@ namespace WpfTouchFrameSample
         public MainWindow()
         {
             InitializeComponent();
-
+            
+            var window = Window.GetWindow(this);
+            window.KeyDown += OnKeyDown;
+            
             var vectorA = new Vector2d(1, 1);
             var vectorB = new Vector2d(1, 4);
             var vectorC = new Vector2d(4, 1);
@@ -76,40 +82,84 @@ namespace WpfTouchFrameSample
 
         private void updateOnTouchDown(MyTouchpoint touchPoint)
         {
-            countTouches++;
-            Console.WriteLine("OnTouchDown [" + touchPoint.ID.ToString() + "]");
+            lock (thisLock)
+            {
+                Console.WriteLine("OnTouchDown [" + touchPoint.ID.ToString() + "]");
 
-            // add new touchpoint to map
-            touchPointList.Add(touchPoint);
+                // add new touchpoint to map
+                touchPointList.Add(touchPoint);
 
-            // calculate distance with minimum 2 touch points
-            calcDistance();
+                Console.WriteLine("OnTouchDown [" + touchPointList.Count + "]");
 
-            updateText();
+                // calculate distance with minimum 2 touch points
+                calcDistance();
+
+                updateText();
+            }
+        }
+
+        private void OnKeyDown(object sender, System.Windows.Input.KeyEventArgs e)
+        { 
+            if (e.Key.ToString().Equals("S"))
+            {
+                Console.WriteLine(CaptureValues());
+            }
+            else if(e.Key.ToString().Equals("C"))
+            {
+                touchPointList.Clear();
+                updateText();
+                xaml_number_of_touchpoints.Document.Blocks.Clear();
+            }
+        }
+
+        private String CaptureValues()
+        {
+            StringBuilder builder = new StringBuilder("[");
+
+            foreach (var tp in touchPointList)
+            {               
+                builder.AppendFormat("({0},{1})", tp.Position.X, tp.Position.Y);
+            }
+
+            return builder.Append("]").ToString();
         }
 
         private void updateOnTouchUp(MyTouchpoint touchPointToRemove)
         {
-            // find touch point and remove it
-            foreach (MyTouchpoint touchPoint in touchPointList)
+            lock (thisLock)
             {
-
-
-                if (Math.Abs(touchPoint.Position.X - touchPointToRemove.Position.X) <= threshold &&
-                    Math.Abs(touchPoint.Position.Y - touchPointToRemove.Position.Y) <= threshold )
+                bool found = false;
+                // find touch point and remove it
+                foreach (MyTouchpoint touchPoint in touchPointList)
                 {
-                    Console.WriteLine("OnTouchUp [" + touchPoint.ID.ToString() + "]");
-                    touchPointList.Remove(touchPoint);
-                    // decrease number of touch points
-                    countTouches--;
+                    var deviationX = Math.Abs(touchPoint.Position.X - touchPointToRemove.Position.X);
+                    var deviationY = Math.Abs(touchPoint.Position.Y - touchPointToRemove.Position.Y);
 
-                    // calculate distance with minimum 2 touch points
-                    calcDistance();
+                    if (Math.Floor(((deviationX + deviationY) / 2)) <= threshold)                        
+                    {
+                        Console.WriteLine("OnTouchUp [" + touchPoint.ID.ToString() + "]");
 
-                    updateText();
+                        // decrease number of touch points
+                        touchPointList.Remove(touchPoint);
 
-                    // return because the foreach won't recognize the updated number of elements
-                    return;
+
+                        Console.WriteLine("OnTouchUp [" + touchPointList.Count + "]");
+
+                        // calculate distance with minimum 2 touch points
+                        calcDistance();
+
+                        updateText();
+
+                        // return because the foreach won't recognize the updated number of elements
+                        found = true;
+                        break;
+                    }
+                }
+
+                if (!found)
+                {
+                    Console.WriteLine(String.Format("Couldn't find touchpoint x: {0} y: {1}", touchPointToRemove.Position.X, touchPointToRemove.Position.Y));
+
                 }
             }
         }
