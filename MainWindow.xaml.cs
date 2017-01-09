@@ -93,10 +93,10 @@ namespace WpfTouchFrameSample
             // find touch point and remove it
             foreach (MyTouchpoint touchPoint in touchPointList)
             {
-                if (touchPoint.Position.X - touchPointToRemove.Position.X <= threshold ||
-                    touchPoint.Position.Y - touchPointToRemove.Position.Y <= threshold ||
-                    touchPointToRemove.Position.X - touchPoint.Position.X <= threshold ||
-                    touchPointToRemove.Position.Y - touchPoint.Position.Y <= threshold)
+
+
+                if (Math.Abs(touchPoint.Position.X - touchPointToRemove.Position.X) <= threshold &&
+                    Math.Abs(touchPoint.Position.Y - touchPointToRemove.Position.Y) <= threshold )
                 {
                     Console.WriteLine("OnTouchUp [" + touchPoint.ID.ToString() + "]");
                     touchPointList.Remove(touchPoint);
