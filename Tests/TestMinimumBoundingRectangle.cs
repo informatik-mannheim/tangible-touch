@@ -67,6 +67,7 @@ namespace WpfApplication4.Tests
             Assert.IsFalse(box.Points.Contains(vectorP));
         }
 
+
         [Test]
         public void RotatedAndTranslated()
         {

@@ -41,7 +41,7 @@ namespace WpfApplication4.Geometry
 
             if (known.Count() == 3)
             {
-                return new Touchcode(known);
+                return new Touchcode(known, null);
             }
             else
             {
@@ -50,7 +50,7 @@ namespace WpfApplication4.Geometry
                 var c = new Vector2d((a.X + b.X) / 2, (a.Y + b.Y) / 2);
                 if (touchPoints.Contains(c))
                 {
-                    return new Touchcode(new List<Vector2d>() { known[0], known[1], c });
+                    return new Touchcode(new List<Vector2d>() { known[0], known[1], c }, null);
                 }
                 else
                 {
@@ -58,6 +58,8 @@ namespace WpfApplication4.Geometry
                 }
             }
         }
+
+    
 
         protected Touchcode(List<Vector2d> fixPoints, List<Vector2d> touchPoints)
         {
@@ -71,7 +73,7 @@ namespace WpfApplication4.Geometry
     public class InvalidTouchcode : Touchcode
     {
         public InvalidTouchcode()
-            : base(null)
+            : base(null, null)
         {
             Id = int.MinValue;
         }
