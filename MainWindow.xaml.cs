@@ -10,6 +10,7 @@ using System.Text;
 using WpfApplication4.Geometry;
 using WpfApplication4.Geometry.Elements;
 
+
 namespace WpfTouchFrameSample
 {
     public partial class MainWindow : Window
@@ -45,6 +46,8 @@ namespace WpfTouchFrameSample
 
             var box = MinimalBoundingBox.Calculate(vectors);
             Console.WriteLine(box.ToString());
+
+            Console.WriteLine(TouchcodeAPI.Parse());
         }
 
         void OnTouchDown(object sender, TouchEventArgs e)

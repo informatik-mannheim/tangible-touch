@@ -85,6 +85,7 @@
     <Compile Include="Tests\TestTouchcode.cs" />
     <Compile Include="Tests\TestVectorStuff.cs" />
     <Compile Include="Tests\TouchpointsTests.cs" />
+    <Compile Include="TouchcodeAPI.cs" />
     <Compile Include="Touchpoints.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
