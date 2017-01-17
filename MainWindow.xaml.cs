@@ -9,6 +9,9 @@ using System.Drawing;
 using System.Text;
 using WpfApplication4.Geometry;
 using WpfApplication4.Geometry.Elements;
+using System.Reflection;
+using System.IO;
+
 
 
 namespace WpfTouchFrameSample
@@ -46,7 +49,7 @@ namespace WpfTouchFrameSample
 
             var box = MinimalBoundingBox.Calculate(vectors);
             Console.WriteLine(box.ToString());
-
+            
             Console.WriteLine(TouchcodeAPI.Parse());
         }
 
@@ -184,7 +187,7 @@ namespace WpfTouchFrameSample
                 {
                     xaml_distances.AppendText("\n" + "Distance between the Points " + distance);
                 }
-
+                
                 //Console.WriteLine(distanceList.Count);
             }
         }

@@ -14,7 +14,10 @@ namespace WpfApplication4
     {
         public static int Parse()
         {
-            return RunScript("c:\\Users\\horst\\code\\tangibletouch\\mirror.py", "hallowelt");
+            var basePath = Path.GetDirectoryName(AppDomain.CurrentDomain.BaseDirectory);
+            var scriptPath = Path.GetFullPath(Path.Combine(basePath, @"..\..\python\touchcode.py"));
+
+            return RunScript(scriptPath, "hallowelt");
         }
 
         private static int RunScript(string cmd, string args)
