@@ -35,8 +35,10 @@ namespace WpfApplication4
             start.FileName = "C:\\Python35\\python.exe";
             start.Arguments = string.Format("{0} {1}", cmd, args);
             start.UseShellExecute = false;
+            start.WindowStyle = ProcessWindowStyle.Hidden;
             start.RedirectStandardOutput = true;
             start.RedirectStandardError = true;
+            start.CreateNoWindow = true;
 
             try
             {
@@ -76,14 +78,23 @@ namespace WpfApplication4
 
         public static void CheckIfTouchcodeAPIWorks()
         {
-            var tps = new List<TouchPoint>();
+            try
+            {
+                var tps = new List<TouchPoint>();
 
-            tps.Add(new TouchPoint(new IHaveNoTouchDevice(666), new System.Windows.Point(0, 0), new Rect(), new TouchAction()));
-            tps.Add(new TouchPoint(new IHaveNoTouchDevice(666), new System.Windows.Point(0, 3), new Rect(), new TouchAction()));
-            tps.Add(new TouchPoint(new IHaveNoTouchDevice(666), new System.Windows.Point(3, 0), new Rect(), new TouchAction()));
-            tps.Add(new TouchPoint(new IHaveNoTouchDevice(666), new System.Windows.Point(2, 2), new Rect(), new TouchAction()));
+                tps.Add(new TouchPoint(new IHaveNoTouchDevice(666), new System.Windows.Point(0, 0), new Rect(), new TouchAction()));
+                tps.Add(new TouchPoint(new IHaveNoTouchDevice(666), new System.Windows.Point(0, 3), new Rect(), new TouchAction()));
+                tps.Add(new TouchPoint(new IHaveNoTouchDevice(666), new System.Windows.Point(3, 0), new Rect(), new TouchAction()));
+                tps.Add(new TouchPoint(new IHaveNoTouchDevice(666), new System.Windows.Point(2, 2), new Rect(), new TouchAction()));
 
-            Console.WriteLine(string.Format("Touchcode API is {0}", TouchcodeAPI.Check(tps) == 16 ? "working" : "NOT working"));
+                Console.WriteLine(string.Format("Touchcode API is {0}", TouchcodeAPI.Check(tps) == 16 ? "working" : "NOT working"));
+            }
+            catch(TouchcodeSubprocessException ex)
+            {
+                Console.WriteLine("Touchcode API is NOT working");
+            }
+
+            
         }
 
         class IHaveNoTouchDevice : TouchDevice

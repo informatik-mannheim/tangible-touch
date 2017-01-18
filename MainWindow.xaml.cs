@@ -163,13 +163,15 @@ namespace WpfTouchFrameSample
         {
             xaml_xy_coordinates.Document.Blocks.Clear();
 
+            xaml_xy_coordinates.AppendText(string.Format("Current Touchcode is: {0}\n\n", _currentTouchcode));
+
             foreach (MyTouchpoint touchPoint in touchPointList)
             {
                 xaml_number_of_touchpoints.Document.Blocks.Clear();
 
                 xaml_number_of_touchpoints.AppendText(touchPointList.Count.ToString());
                 xaml_xy_coordinates.AppendText(touchPoint.ToString());
-                xaml_xy_coordinates.AppendText(string.Format("Current Touchcode is: {0}", _currentTouchcode));
+                
 
                 xaml_distances.Document.Blocks.Clear();
 
