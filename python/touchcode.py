@@ -119,7 +119,7 @@ def find_vx_vy(hull, origin, v1, v2):
             origin_index = v
     
     # roll the vertices to start with the origin. vx will always be to the right of the origin, vy will be left
-    verts = np.roll(hull.vertices, np.asscalar(np.where(hull.vertices == origin_index)[0]))
+    verts = np.roll(hull.vertices, -np.asscalar(np.where(hull.vertices == origin_index)[0]))
 
     for v in verts:
         if np.array_equal(hull.points[v], v1):
