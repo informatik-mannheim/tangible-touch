@@ -2,3 +2,4 @@
 bin/Debug/
 obj/
 *.suo
+python/build/
