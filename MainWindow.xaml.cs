@@ -1,17 +1,10 @@
 ﻿using System;
 using System.Windows;
 using System.Windows.Input;
-using System.Collections;
 using System.Collections.Generic;
 using WpfApplication4;
-using System.Windows.Forms;
-using System.Drawing;
-using System.Text;
 using WpfApplication4.Geometry;
 using WpfApplication4.Geometry.Elements;
-using System.Reflection;
-using System.IO;
-
 
 
 namespace WpfTouchFrameSample
@@ -20,10 +13,11 @@ namespace WpfTouchFrameSample
     {
         private Object thisLock = new Object();
 
-        private int countTouches = 0;
-        private int countDistances = 0;
-        private int threshold = 15;
-        
+        private int _countTouches = 0;
+        private int _countDistances = 0;
+        private int _threshold = 15;
+        private int _currentTouchcode = -1;
+
         private Dictionary<int, TouchPoint> touchPointMap = new Dictionary<int, TouchPoint>();
         private List<TouchPoint> touchPointList = new List<TouchPoint>();
 
@@ -32,13 +26,14 @@ namespace WpfTouchFrameSample
 
         public delegate void UpdateTextCallback(string text);
 
+
         public MainWindow()
         {
             InitializeComponent();
-            
+
             var window = Window.GetWindow(this);
             window.KeyDown += OnKeyDown;
-            
+
             var vectorA = new Vector2d(1, 1);
             var vectorB = new Vector2d(1, 4);
             var vectorC = new Vector2d(4, 1);
@@ -49,9 +44,10 @@ namespace WpfTouchFrameSample
 
             var box = MinimalBoundingBox.Calculate(vectors);
             Console.WriteLine(box.ToString());
-            
-            Console.WriteLine(TouchcodeAPI.Parse());
+
+            TouchcodeAPI.CheckIfTouchcodeAPIWorks();
         }
+
 
         void OnTouchDown(object sender, TouchEventArgs e)
         {
@@ -95,6 +91,10 @@ namespace WpfTouchFrameSample
                 // add new touchpoint to map
                 touchPointList.Add(touchPoint);
 
+                // check touchcode
+           
+                _currentTouchcode = TouchcodeAPI.Check(touchPointList);
+
                 Console.WriteLine("OnTouchDown [" + touchPointList.Count + "]");
 
                 // calculate distance with minimum 2 touch points
@@ -105,29 +105,17 @@ namespace WpfTouchFrameSample
         }
 
         private void OnKeyDown(object sender, System.Windows.Input.KeyEventArgs e)
-        { 
+        {
             if (e.Key.ToString().Equals("S"))
             {
-                Console.WriteLine(CaptureValues());
+                Console.WriteLine(TouchcodeAPI.Serialize(touchPointList));
             }
-            else if(e.Key.ToString().Equals("C"))
+            else if (e.Key.ToString().Equals("C"))
             {
                 touchPointList.Clear();
                 updateText();
                 xaml_number_of_touchpoints.Document.Blocks.Clear();
             }
-        }
-
-        private String CaptureValues()
-        {
-            StringBuilder builder = new StringBuilder("[");
-
-            foreach (var tp in touchPointList)
-            {               
-                builder.AppendFormat("({0},{1})", tp.Position.X, tp.Position.Y);
-            }
-
-            return builder.Append("]").ToString();
         }
 
         private void updateOnTouchUp(MyTouchpoint touchPointToRemove)
@@ -141,13 +129,14 @@ namespace WpfTouchFrameSample
                     var deviationX = Math.Abs(touchPoint.Position.X - touchPointToRemove.Position.X);
                     var deviationY = Math.Abs(touchPoint.Position.Y - touchPointToRemove.Position.Y);
 
-                    if (Math.Floor(((deviationX + deviationY) / 2)) <= threshold)                        
+                    if (Math.Floor(((deviationX + deviationY) / 2)) <= _threshold)
                     {
                         Console.WriteLine("OnTouchUp [" + touchPoint.ID.ToString() + "]");
 
                         // decrease number of touch points
                         touchPointList.Remove(touchPoint);
 
+                        _currentTouchcode = TouchcodeAPI.Check(touchPointList);
 
                         Console.WriteLine("OnTouchUp [" + touchPointList.Count + "]");
 
@@ -180,6 +169,7 @@ namespace WpfTouchFrameSample
 
                 xaml_number_of_touchpoints.AppendText(touchPointList.Count.ToString());
                 xaml_xy_coordinates.AppendText(touchPoint.ToString());
+                xaml_xy_coordinates.AppendText(string.Format("Current Touchcode is: {0}", _currentTouchcode));
 
                 xaml_distances.Document.Blocks.Clear();
 
@@ -187,8 +177,6 @@ namespace WpfTouchFrameSample
                 {
                     xaml_distances.AppendText("\n" + "Distance between the Points " + distance);
                 }
-                
-                //Console.WriteLine(distanceList.Count);
             }
         }
 
@@ -197,7 +185,7 @@ namespace WpfTouchFrameSample
             // calculating the distances new with the touch points which left...
             distanceList = new List<Double>();
 
-            if (countTouches >= 2)
+            if (_countTouches >= 2)
             {
                 for (int i = 0; i < touchPointList.Count; i++)
                 {
@@ -214,7 +202,7 @@ namespace WpfTouchFrameSample
                             // add distance value to map
                             distanceList.Add(distance);
                             // increase number of distances
-                            countDistances++;
+                            _countDistances++;
                             xaml_distances.AppendText("\n" + "Distance between the Points " + distance);
                         }
                     }
@@ -223,7 +211,7 @@ namespace WpfTouchFrameSample
 
         }
 
-      
+
 
         public class MyTouchpoint : TouchPoint
         {
@@ -243,7 +231,8 @@ namespace WpfTouchFrameSample
 
             public Guid ID
             {
-                get; private set;
+                get;
+                private set;
             }
         }
     }

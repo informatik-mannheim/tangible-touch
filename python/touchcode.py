@@ -4,30 +4,12 @@ import numpy as np
 from operator import itemgetter
 from scipy.spatial import ConvexHull
 from scipy.spatial import distance
-import sys
+import re
 
 DEBUG = False
 
-samples = {}
-samples[0x80] = [[(1643,614),(1450,649),(1555,663),(1568,731)],
-           [(577,629),(379,577),(471,631),(453,701)],
-           [(1486,68),(1638,213), (1581,119),(1628,69)],
-           [(1676,651),(1530,799),(1619,750),(1675,791)],
-           [(176,469), (320,324),(225,373),(175,324)],            
-           [(725,544),(860,697),(819,599),(869,557)],
-           [(346,509),(494,368),(399,415),(346,367)],
-           [(769,593),(750,792),(793,695),(865,701)],
-            [(269,202),(477,205),(375,164),(382,93)]]
-    
-samples[0x10] = [[(552,647),(363,572),(467,578),(423,707)],
-                 [(382,429),(464,244),(452,345),(325,294)],
-                [(1533,244),(1540,447), (1500,346),(1641,334)],
-                [(199,589),(405,620),(302,637),(320,505)]]
-
-garbage = [[(303,152), (379,577),(368,171),(368,285)],
-           [(1473,235),(1417,328),(1563,340),(1624,263)]]
-
 def log(message):
+    """Prints a message only if DEBUG = True, so that all printing to stdout can be easily disabled."""
     if DEBUG:
         print(message)
 
@@ -37,6 +19,19 @@ def are_same(reference, value, percentage):
     result = min_value < value < max_value
     
     return result
+
+def string_to_coords(coord_string):
+    """
+    Checks and decodes a coordinates string (that is passed to the API on the command line) into coordinates.
+    Returns an empty list if it is not well formed.
+    """
+    if not isinstance(coord_string, str):
+        return []
+    
+    coord_string = re.sub(r'\s+', '', coord_string, flags=re.UNICODE)
+    is_well_formed = re.match(r'\[(\(\d+,\d+\),){0,}(\(\d+,\d+\))\]', coord_string)
+    
+    return eval(coord_string) if is_well_formed else []
 
 
 def approximates(ref_point, point, max_deviation):
@@ -55,7 +50,7 @@ def get_orientation_marks(points):
     Returns (None, None, None) if no reference system found.
     """
     p_threshold = 0.08
-    no_result = (None, None, None)
+    no_result = None
 
     # no touchcode if there are not enough points
     if points is None or len(points) < 3:
@@ -102,7 +97,7 @@ def get_orientation_marks(points):
     try:
         origin = np.array([k for k, v in collections.Counter(candidates).items() if v == 2])[0]
     except:
-        return (None, None, None)
+        return no_result
     
     log("origin: {0}".format(origin))
     
@@ -159,6 +154,7 @@ def norm(reference, point):
     
     return (round(xcor, 1), round(ycor, 1))
 
+
 def touchcode_from_points(points):   
     """Generate touchcode for a set of normalized touchpoints."""
     
@@ -188,21 +184,26 @@ def touchcode_from_points(points):
 def check_touchcode(points):
     """Main API function. Takes a list of points, finds the reference system in it and tries to decode 
     the corresponding touchcode.
+    
+    Returns: A touchcode from 0 to 4095 (12 bit) or -1 if no touchcode could be decoded.
     """
+    no_result = -1
+    
+    if points is None or not isinstance(points, list):
+        return no_result
+    
     reference_system = get_orientation_marks(points)
      
-    if any(map(lambda value: value is None, reference_system)):
-        return None
+    if reference_system is None:
+        return no_result
     
     touchpoints = [norm(reference_system, point) for point in points]
     
     return touchcode_from_points(touchpoints)
 
-if __name__ == "__main__":
-	if len(sys.argv) < 2:
-		sys.exit(-1)
-	
-	touchpoints = eval(sys.argv[1])
-	touchcode = check_touchcode(touchpoints)
-	print(touchcode)
-	sys.exit(touchcode)
+def check_touchcode_str(coord_string):
+    """
+    Wrapper around check_touchcode_lst to make it externally callable with a string of coordinates.
+    """
+    
+    return check_touchcode(string_to_coords(coord_string))
