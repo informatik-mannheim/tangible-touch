@@ -180,17 +180,27 @@ def touchcode_from_points(points):
     
     return touchcode
 
+def xmirror(points, max_y):
+    mirrored_points = []
+       
+    for point in points:
+        mirrored_points.append((point[0], max_y - point[1]))
+        
+    return mirrored_points
 
-def check_touchcode(points):
+def check_touchcode(points, x_mirror=True, max_y=1080):
     """Main API function. Takes a list of points, finds the reference system in it and tries to decode 
     the corresponding touchcode.
     
     Returns: A touchcode from 0 to 4095 (12 bit) or -1 if no touchcode could be decoded.
-    """
+    """       
     no_result = -1
     
     if points is None or not isinstance(points, list):
         return no_result
+    
+    if x_mirror:
+        points = xmirror(points, max_y)
     
     reference_system = get_orientation_marks(points)
      
@@ -201,9 +211,9 @@ def check_touchcode(points):
     
     return touchcode_from_points(touchpoints)
 
-def check_touchcode_str(coord_string):
+def check_touchcode_str(coord_string, x_mirror=True):
     """
     Wrapper around check_touchcode_lst to make it externally callable with a string of coordinates.
     """
     
-    return check_touchcode(string_to_coords(coord_string))
+    return check_touchcode(string_to_coords(coord_string), x_mirror)
