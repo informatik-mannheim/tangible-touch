@@ -29,19 +29,6 @@ namespace WpfApplication4
             return RunScript(scriptPath, Serialize(touchpoints));
         }
 
-        public static string Serialize(List<TouchPoint> touchpoints)
-        {
-            StringBuilder builder = new StringBuilder("[");
-
-            for(int i = 0; i < touchpoints.Count; i++)
-            {
-                var tp = touchpoints[i];
-                builder.AppendFormat("({0},{1}){2}", tp.Position.X, tp.Position.Y, i == touchpoints.Count - 1 ? "" : ",");
-            }
-
-            return builder.Append("]").ToString();
-        }
-
         private static int RunScript(string cmd, string args)
         {
             ProcessStartInfo start = new ProcessStartInfo();
@@ -63,6 +50,18 @@ namespace WpfApplication4
             }
         }
 
+        public static string Serialize(List<TouchPoint> touchpoints)
+        {
+            StringBuilder builder = new StringBuilder("[");
+
+            for (int i = 0; i < touchpoints.Count; i++)
+            {
+                var tp = touchpoints[i];
+                builder.AppendFormat("({0},{1}){2}", tp.Position.X, tp.Position.Y, i == touchpoints.Count - 1 ? "" : ",");
+            }
+
+            return builder.Append("]").ToString();
+        }
 
         class TouchcodeSubprocessException : Exception
         {
@@ -84,7 +83,7 @@ namespace WpfApplication4
             tps.Add(new TouchPoint(new IHaveNoTouchDevice(666), new System.Windows.Point(3, 0), new Rect(), new TouchAction()));
             tps.Add(new TouchPoint(new IHaveNoTouchDevice(666), new System.Windows.Point(2, 2), new Rect(), new TouchAction()));
 
-            Console.WriteLine(TouchcodeAPI.Check(tps));
+            Console.WriteLine(string.Format("Touchcode API is {0}", TouchcodeAPI.Check(tps) == 16 ? "working" : "NOT working"));
         }
 
         class IHaveNoTouchDevice : TouchDevice
