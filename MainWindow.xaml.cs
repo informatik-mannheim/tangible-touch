@@ -3,6 +3,7 @@ using System.Windows;
 using System.Windows.Input;
 using System.Collections.Generic;
 using WpfApplication4;
+using WpfApplication4.Touchcode;
 
 namespace WpfTouchFrameSample
 {
@@ -201,8 +202,6 @@ namespace WpfTouchFrameSample
             }
 
         }
-
-
 
         public class MyTouchpoint : TouchPoint
         {

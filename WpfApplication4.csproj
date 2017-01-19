@@ -87,8 +87,8 @@
     </ApplicationDefinition>
     <Compile Include="InvalidTouchPointsException.cs" />
     <Compile Include="ITouchcodeAPI.cs" />
-    <Compile Include="TouchcodePythonAPI.cs" />
-    <Compile Include="TouchcodeNativeAPI.cs" />
+    <Compile Include="Touchcode\TouchcodePythonAPI.cs" />
+    <Compile Include="Touchcode\TouchcodeNativeAPI.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
