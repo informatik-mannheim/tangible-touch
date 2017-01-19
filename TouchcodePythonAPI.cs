@@ -12,11 +12,11 @@ using System.Windows;
 
 namespace WpfApplication4
 {
-    class TouchcodeAPI
+    class TouchcodePythonAPI : ITouchcodeAPI
     {
         public string _example = "[(0,0),(0,3),(1,3),(2,3),(0,2),(1,2),(2,2),(3,2),(0,1),(1,1),(2,1),(3,1),(1,0),(2,0),(3,0)]";
 
-        public static int Check(List<TouchPoint> touchpoints)
+        public int Check(List<TouchPoint> touchpoints)
         {
             if (touchpoints == null || touchpoints.Count < 3)
             {
@@ -52,7 +52,7 @@ namespace WpfApplication4
             }
         }
 
-        public static string Serialize(List<TouchPoint> touchpoints)
+        public string Serialize(List<TouchPoint> touchpoints)
         {
             StringBuilder builder = new StringBuilder("[");
 
@@ -76,7 +76,7 @@ namespace WpfApplication4
             { }
         }
 
-        public static void CheckIfTouchcodeAPIWorks()
+        public void CheckIfTouchcodeAPIWorks()
         {
             try
             {
@@ -87,7 +87,7 @@ namespace WpfApplication4
                 tps.Add(new TouchPoint(new IHaveNoTouchDevice(666), new System.Windows.Point(3, 0), new Rect(), new TouchAction()));
                 tps.Add(new TouchPoint(new IHaveNoTouchDevice(666), new System.Windows.Point(2, 2), new Rect(), new TouchAction()));
 
-                Console.WriteLine(string.Format("Touchcode API is {0}", TouchcodeAPI.Check(tps) == 16 ? "working" : "NOT working"));
+                Console.WriteLine(string.Format("Touchcode API is {0}", Check(tps) == 16 ? "working" : "NOT working"));
             }
             catch(TouchcodeSubprocessException ex)
             {

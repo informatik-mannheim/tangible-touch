@@ -4,3 +4,4 @@ obj/
 *.suo
 python/build/
 __pycache__
+.ipynb_checkpoints/

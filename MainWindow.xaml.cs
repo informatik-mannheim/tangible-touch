@@ -3,9 +3,6 @@ using System.Windows;
 using System.Windows.Input;
 using System.Collections.Generic;
 using WpfApplication4;
-using WpfApplication4.Geometry;
-using WpfApplication4.Geometry.Elements;
-
 
 namespace WpfTouchFrameSample
 {
@@ -17,6 +14,8 @@ namespace WpfTouchFrameSample
         private int _countDistances = 0;
         private int _threshold = 15;
         private int _currentTouchcode = -1;
+
+        private ITouchcodeAPI _touchcodeAPI;
 
         private Dictionary<int, TouchPoint> touchPointMap = new Dictionary<int, TouchPoint>();
         private List<TouchPoint> touchPointList = new List<TouchPoint>();
@@ -34,18 +33,8 @@ namespace WpfTouchFrameSample
             var window = Window.GetWindow(this);
             window.KeyDown += OnKeyDown;
 
-            var vectorA = new Vector2d(1, 1);
-            var vectorB = new Vector2d(1, 4);
-            var vectorC = new Vector2d(4, 1);
-            var vectorD = new Vector2d(2, 3);
-            var vectorE = new Vector2d(3, 2);
-
-            Vector2d[] vectors = new Vector2d[] { vectorA, vectorB, vectorC, vectorD, vectorE };
-
-            var box = MinimalBoundingBox.Calculate(vectors);
-            Console.WriteLine(box.ToString());
-
-            TouchcodeAPI.CheckIfTouchcodeAPIWorks();
+            _touchcodeAPI = new TouchcodePythonAPI();
+            _touchcodeAPI.CheckIfTouchcodeAPIWorks();
         }
 
 
@@ -92,8 +81,8 @@ namespace WpfTouchFrameSample
                 touchPointList.Add(touchPoint);
 
                 // check touchcode
-           
-                _currentTouchcode = TouchcodeAPI.Check(touchPointList);
+
+                _currentTouchcode = _touchcodeAPI.Check(touchPointList);
 
                 Console.WriteLine("OnTouchDown [" + touchPointList.Count + "]");
 
@@ -108,7 +97,7 @@ namespace WpfTouchFrameSample
         {
             if (e.Key.ToString().Equals("S"))
             {
-                Console.WriteLine(TouchcodeAPI.Serialize(touchPointList));
+                Console.WriteLine(_touchcodeAPI.Serialize(touchPointList));
             }
             else if (e.Key.ToString().Equals("C"))
             {
@@ -136,7 +125,7 @@ namespace WpfTouchFrameSample
                         // decrease number of touch points
                         touchPointList.Remove(touchPoint);
 
-                        _currentTouchcode = TouchcodeAPI.Check(touchPointList);
+                        _currentTouchcode = _touchcodeAPI.Check(touchPointList);
 
                         Console.WriteLine("OnTouchUp [" + touchPointList.Count + "]");
 
