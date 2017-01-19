@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Windows.Input;
 
-namespace WpfApplication4
+namespace WpfApplication4.Touchcode
 {
     interface ITouchcodeAPI
     {

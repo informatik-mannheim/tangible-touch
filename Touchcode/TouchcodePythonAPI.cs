@@ -1,13 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using System.Diagnostics;
 using System.IO;
-using System.ComponentModel;
 using System.Windows.Input;
-using System.Windows;
 
 
 namespace WpfApplication4.Touchcode
@@ -82,37 +78,17 @@ namespace WpfApplication4.Touchcode
             {
                 var tps = new List<TouchPoint>();
 
-                tps.Add(new TouchPoint(new IHaveNoTouchDevice(666), new System.Windows.Point(0, 0), new Rect(), new TouchAction()));
-                tps.Add(new TouchPoint(new IHaveNoTouchDevice(666), new System.Windows.Point(0, 3), new Rect(), new TouchAction()));
-                tps.Add(new TouchPoint(new IHaveNoTouchDevice(666), new System.Windows.Point(3, 0), new Rect(), new TouchAction()));
-                tps.Add(new TouchPoint(new IHaveNoTouchDevice(666), new System.Windows.Point(2, 2), new Rect(), new TouchAction()));
+                tps.Add(new FakeTouchPoint(0, 0));
+                tps.Add(new FakeTouchPoint(0, 3));
+                tps.Add(new FakeTouchPoint(3, 0));
+                tps.Add(new FakeTouchPoint(2, 2));
 
                 Console.WriteLine(string.Format("Touchcode API is {0}", Check(tps) == 16 ? "working" : "NOT working"));
             }
-            catch(TouchcodeSubprocessException ex)
+            catch (TouchcodeSubprocessException ex)
             {
                 Console.WriteLine("Touchcode API is NOT working");
             }
-
-            
         }
-
-        class IHaveNoTouchDevice : TouchDevice
-        {
-            public IHaveNoTouchDevice(int deviceId)
-                : base(deviceId)
-            { }
-
-            public override TouchPointCollection GetIntermediateTouchPoints(IInputElement relativeTo)
-            {
-                throw new NotImplementedException();
-            }
-
-            public override TouchPoint GetTouchPoint(IInputElement relativeTo)
-            {
-                throw new NotImplementedException();
-            }
-        }
-
     }
 }

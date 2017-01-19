@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace WpfApplication4
+namespace WpfApplication4.Touchcode
 {
     class InvalidTouchPointsException : Exception
     {

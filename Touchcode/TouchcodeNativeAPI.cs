@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace WpfApplication4.Touchcode
 {
@@ -15,7 +12,12 @@ namespace WpfApplication4.Touchcode
 
         public int Check(List<System.Windows.Input.TouchPoint> touchpoints)
         {
-            throw new NotImplementedException();
+            if(touchpoints == null || touchpoints.Count < 3)
+            {
+                return -1;
+            }
+
+            return -1;
         }
 
         public string Serialize(List<System.Windows.Input.TouchPoint> touchpoints)
