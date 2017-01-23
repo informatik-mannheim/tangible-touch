@@ -9,28 +9,10 @@ using System.Text;
 
 namespace WpfApplication4.Touchcode
 {
-    static class ExtensionMethods
+    public class TouchcodeAPI
     {
-        public static IEnumerable<IEnumerable<T>> Combinations<T>(this IEnumerable<T> elements, int k)
-        {
-            return k == 0 ? new[] { new T[0] } :
-              elements.SelectMany((e, i) =>
-                elements.Skip(i + 1).Combinations(k - 1).Select(c => (new[] { e }).Concat(c)));
-        }
+        private int NO_TOUCHCODE = -1;
 
-        public static bool AlmostEqual(this Point2D thisPoint, Point2D thatPoint, double threshold)
-        {
-            return Precision.AlmostEqual(thisPoint.X, thatPoint.X, threshold) && Precision.AlmostEqual(thisPoint.Y, thatPoint.Y, threshold);
-        }
-
-        public static bool HasSameOrientationAs(this Vector2D thisVector, Vector2D otherVector)
-        {
-            return thisVector.DotProduct(otherVector) > 0;
-        }
-    }
-
-    class TouchcodeNativeAPI
-    {
         private Dictionary<Point2D, int> _touchpointMap = new Dictionary<Point2D, int> {
             { new Point2D(1, 3), 0x001 },
             { new Point2D(2, 3), 0x002 },
@@ -46,11 +28,6 @@ namespace WpfApplication4.Touchcode
             { new Point2D(2, 0), 0x800 },
         };
 
-        public void CheckIfTouchcodeAPIWorks()
-        {
-            throw new NotImplementedException();
-        }
-
         public int Check(IList<TouchPoint> touchPoints, bool xMirror = true, int maxY = 1080)
         {
             return Check(touchPoints.Select(point => new Point2D(point.Position.X, point.Position.Y)).ToList(), xMirror, maxY);
@@ -60,7 +37,7 @@ namespace WpfApplication4.Touchcode
         {
             if (touchpoints == null || touchpoints.Count < 3)
             {
-                return -1;
+                return NO_TOUCHCODE;
             }
 
             if (xMirror)
@@ -72,12 +49,10 @@ namespace WpfApplication4.Touchcode
 
             if(referenceSystem == null)
             {
-                return -1;
+                return NO_TOUCHCODE;
             }
 
-            var newTouchpoints = touchpoints.Select(point => Normalize(referenceSystem, point)).ToList();
-
-            return MapPointsToTouchcode(newTouchpoints);
+            return MapPointsToTouchcode(touchpoints.Select(point => Normalize(referenceSystem, point)));
         }
 
         private Point2D Normalize(Tuple<Point2D, Point2D, Point2D> referenceSystem, Point2D point)
@@ -166,11 +141,11 @@ namespace WpfApplication4.Touchcode
             }
         }
 
-        public int MapPointsToTouchcode(List<Point2D> touchPoints)
+        public int MapPointsToTouchcode(IEnumerable<Point2D> touchPoints)
         {
             var threshold = 0.2001;
             var touchcode = 0;
-
+            
             _touchpointMap.ToList().ForEach(map => touchcode |= touchPoints.Any(tp => tp.AlmostEqual(map.Key, threshold)) ? map.Value : 0);
 
             return touchcode;
@@ -192,6 +167,26 @@ namespace WpfApplication4.Touchcode
             }
 
             return builder.Append("]").ToString();
+        }
+    }
+
+    internal static class ExtensionMethods
+    {
+        public static IEnumerable<IEnumerable<T>> Combinations<T>(this IEnumerable<T> elements, int k)
+        {
+            return k == 0 ? new[] { new T[0] } :
+              elements.SelectMany((e, i) =>
+                elements.Skip(i + 1).Combinations(k - 1).Select(c => (new[] { e }).Concat(c)));
+        }
+
+        public static bool AlmostEqual(this Point2D thisPoint, Point2D thatPoint, double threshold)
+        {
+            return Precision.AlmostEqual(thisPoint.X, thatPoint.X, threshold) && Precision.AlmostEqual(thisPoint.Y, thatPoint.Y, threshold);
+        }
+
+        public static bool HasSameOrientationAs(this Vector2D thisVector, Vector2D otherVector)
+        {
+            return thisVector.DotProduct(otherVector) > 0;
         }
     }
 }

@@ -107,7 +107,7 @@ namespace WpfApplication4.Tests
             List<Point2D> touchpoints = null;
 
             // System Under Test
-            var api = new TouchcodeNativeAPI();
+            var api = new TouchcodeAPI();
 
             // Act
             var touchcode = api.Check(touchpoints);
@@ -123,7 +123,7 @@ namespace WpfApplication4.Tests
             List<Point2D> touchpoints = new List<Point2D>();
 
             // System Under Test
-            var api = new TouchcodeNativeAPI();
+            var api = new TouchcodeAPI();
 
             // Act
             var touchcode = api.Check(touchpoints);
@@ -144,7 +144,7 @@ namespace WpfApplication4.Tests
         public void ShouldRecognizeTouchcode0x80()
         {
             // System Under Test
-            var api = new TouchcodeNativeAPI();
+            var api = new TouchcodeAPI();
 
             // Act + Assert
             foreach (var sample in _samples0x80)
@@ -157,7 +157,7 @@ namespace WpfApplication4.Tests
         public void ShouldRecognizeTouchcode0x10()
         {
             // System Under Test
-            var api = new TouchcodeNativeAPI();
+            var api = new TouchcodeAPI();
 
             // Act + Assert
             foreach (var sample in _samples0x10)
@@ -186,7 +186,7 @@ namespace WpfApplication4.Tests
             };
 
             // System Under Test
-            var api = new TouchcodeNativeAPI();
+            var api = new TouchcodeAPI();
 
             // Act + Assert
             foreach (var sample in samplesInvalid)
@@ -202,7 +202,7 @@ namespace WpfApplication4.Tests
             var touchpoints = new List<Point2D>();
 
             // System Under Test
-            var api = new TouchcodeNativeAPI();
+            var api = new TouchcodeAPI();
 
             // Act
             var touchcode = api.MapPointsToTouchcode(touchpoints);
@@ -231,7 +231,7 @@ namespace WpfApplication4.Tests
             };
 
             // System Under Test
-            var api = new TouchcodeNativeAPI();
+            var api = new TouchcodeAPI();
 
             // Act
             var touchcode = api.MapPointsToTouchcode(touchpoints);
@@ -250,7 +250,7 @@ namespace WpfApplication4.Tests
             };
 
             // System Under Test
-            var api = new TouchcodeNativeAPI();
+            var api = new TouchcodeAPI();
 
             // Act
             var touchcode = api.MapPointsToTouchcode(touchpoints);
@@ -270,7 +270,7 @@ namespace WpfApplication4.Tests
             };
 
             // System Under Test
-            var api = new TouchcodeNativeAPI();
+            var api = new TouchcodeAPI();
 
             // Act
             var touchcode = api.MapPointsToTouchcode(touchpoints);
@@ -290,7 +290,7 @@ namespace WpfApplication4.Tests
             };
 
             // System Under Test
-            var api = new TouchcodeNativeAPI();
+            var api = new TouchcodeAPI();
 
             // Act
             var touchcode = api.MapPointsToTouchcode(touchpoints);
@@ -312,7 +312,7 @@ namespace WpfApplication4.Tests
             };
 
             // System Under Test
-            var api = new TouchcodeNativeAPI();
+            var api = new TouchcodeAPI();
 
             // Act
             var touchcode = api.MapPointsToTouchcode(touchpoints);
@@ -336,7 +336,7 @@ namespace WpfApplication4.Tests
             };
 
             // System Under Test
-            var api = new TouchcodeNativeAPI();
+            var api = new TouchcodeAPI();
 
             // Act
             var mirroredPoints = api.MirrorX(touchpoints, maxY);
@@ -360,7 +360,7 @@ namespace WpfApplication4.Tests
             };
 
             // System Under Test
-            var api = new TouchcodeNativeAPI();
+            var api = new TouchcodeAPI();
 
             // Act
             var referenceSystem = api.GetReferenceSystem(touchpoints);
@@ -383,7 +383,7 @@ namespace WpfApplication4.Tests
             };
 
             // System Under Test
-            var api = new TouchcodeNativeAPI();
+            var api = new TouchcodeAPI();
 
             // Act
             var referenceSystem = api.GetReferenceSystem(touchpoints);
@@ -406,7 +406,7 @@ namespace WpfApplication4.Tests
             };
 
             // System Under Test
-            var api = new TouchcodeNativeAPI();
+            var api = new TouchcodeAPI();
 
             // Act
             var referenceSystem = api.GetReferenceSystem(touchpoints);
@@ -431,7 +431,7 @@ namespace WpfApplication4.Tests
             };
 
             // System Under Test
-            var api = new TouchcodeNativeAPI();
+            var api = new TouchcodeAPI();
 
             // Act
             var referenceSystem = api.GetReferenceSystem(touchpoints);
@@ -455,7 +455,7 @@ namespace WpfApplication4.Tests
             };
 
             // System Under Test
-            var api = new TouchcodeNativeAPI();
+            var api = new TouchcodeAPI();
 
             // Act
             var referenceSystem = api.GetReferenceSystem(touchpoints);
@@ -470,7 +470,7 @@ namespace WpfApplication4.Tests
         public void ShouldGetReferenceSystemForSamples0x80()
         {
             // System Under Test
-            var api = new TouchcodeNativeAPI();
+            var api = new TouchcodeAPI();
 
             foreach(var sample in _samples0x80)
             {
@@ -488,7 +488,7 @@ namespace WpfApplication4.Tests
         public void ShouldGetReferenceSystemForSamples0x10()
         {
             // System Under Test
-            var api = new TouchcodeNativeAPI();
+            var api = new TouchcodeAPI();
 
             foreach (var sample in _samples0x10)
             {
@@ -529,7 +529,7 @@ namespace WpfApplication4.Tests
             };
 
             // System Under Test
-            var api = new TouchcodeNativeAPI();
+            var api = new TouchcodeAPI();
 
             // Act
             var touchcode = api.Check(points);
