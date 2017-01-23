@@ -5,6 +5,7 @@ using MathNet.Numerics;
 using MathNet.Spatial;
 using MathNet.Spatial.Euclidean;
 using System.Linq;
+using System.Text;
 
 namespace WpfApplication4.Touchcode
 {
@@ -178,6 +179,19 @@ namespace WpfApplication4.Touchcode
         public IList<Point2D> MirrorX(IEnumerable<Point2D> touchPoints, int maxY = 1080)
         {
             return touchPoints.Select(point => new Point2D(point.X, maxY - point.Y)).ToList();
+        }
+
+        public string Serialize(List<TouchPoint> touchpoints)
+        {
+            StringBuilder builder = new StringBuilder("[");
+
+            for (int i = 0; i < touchpoints.Count; i++)
+            {
+                var tp = touchpoints[i];
+                builder.AppendFormat("({0},{1}){2}", tp.Position.X, tp.Position.Y, i == touchpoints.Count - 1 ? "" : ",");
+            }
+
+            return builder.Append("]").ToString();
         }
     }
 }

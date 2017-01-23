@@ -2,11 +2,43 @@ import collections
 import itertools
 import numpy as np
 from operator import itemgetter
-from scipy.spatial import ConvexHull
 from scipy.spatial import distance
 import re
 
 DEBUG = False
+
+"""Vector stuff"""
+
+def v_same_orientation(v1, v2):
+    return np.dot(v1, v2) > 0
+    
+"""Division by zero problem!"""
+def v_angle(v1, v2):
+    length_v1 = np.linalg.norm(v1)
+    length_v2 = np.linalg.norm(v2)
+    
+    if length_v1 == 0 or length_v2 == 0:
+        return 0
+    
+    return np.round(np.degrees(np.arccos(np.dot(v1, v2) /  length_v1 * length_v2)))
+
+def v_perpendicular(v1, v2, tolerance_deg = 0):
+    return in_range(v_angle(v1, v2), 90, 5)
+
+def v_parallel(v1, v2, tolerance_deg = 0):       
+    return in_range(v_angle(v1, v2), 0, 5) or in_range(v_angle(v1, v2), 180, 5)
+
+def in_range(value, target, tolerance):
+    return target - tolerance <= value <= target + tolerance
+
+def v_rotate(matrix, angle):
+    """rotates the given matrix by angle in degrees, counter clockwise."""
+    angle = np.radians(angle)
+    rot_matrix = np.array( [ [ np.cos(angle), -np.sin(angle)], [ np.sin(angle), np.cos(angle)] ] )
+    return np.dot(rot_matrix, matrix)
+    
+
+"""Helpers"""
 
 def log(message):
     """Prints a message only if DEBUG = True, so that all printing to stdout can be easily disabled."""
@@ -19,6 +51,8 @@ def are_same(reference, value, percentage):
     result = min_value < value < max_value
     
     return result
+
+"""Heavy stuff"""
 
 def string_to_coords(coord_string):
     """
@@ -47,47 +81,28 @@ def get_orientation_marks(points):
     """
     Extract the reference system (o, vx, vy) from a set of points. 
     
-    Returns (None, None, None) if no reference system found.
+    Returns None if no reference system found.
     """
-    p_threshold = 0.08
-    no_result = None
+    p_threshold = 0.10
 
     # no touchcode if there are not enough points
     if points is None or len(points) < 3:
-        return no_result
-
-    # create a convex hull with all points
-    try:
-        hull = ConvexHull(points)  
-    except:
-        return no_result
-    
-    vectors = []
+        return None
     
     # calculate all possible distances between all points
-    for combination in list(itertools.combinations(hull.vertices, 2)):
-        p1 = points[combination[0]]
-        p2 = points[combination[1]]
-        dst = distance.euclidean(p1, p2)
-        
-        vectors.append((p1, p2, dst))      
-        
+    vectors = [(p1, p2, distance.euclidean(p1, p2)) for p1, p2 in list(itertools.combinations(points, 2))]
+
     # get the two points that have the longest distance (those are vx and vy)
-    orientation = max(vectors, key=itemgetter(2))
-    v1 = orientation[0]
-    v2 = orientation[1]
+    v1, v2, longest_distance = max(vectors, key=itemgetter(2))
     
-    log("v1: {0}, v2: {1}, dst(v1, v2): {2}]".format(v1, v2, orientation[2]))
-    
-    # filter distances list to not contain the longest distance anymore
-    vectors = [a for a in vectors if not orientation[2] == a[2]]
+    log("v1: {0}, v2: {1}, dst(v1, v2): {2}]".format(v1, v2, longest_distance))
     
     origin = None
     candidates = []
     
     # find the origin candidates by getting all distances that are longest_distance / sqrt(2)    
     for vector in vectors:
-        if are_same(orientation[2] / np.sqrt(2), vector[2], p_threshold):
+        if are_same(longest_distance / np.sqrt(2), vector[2], p_threshold):
             if np.array_equal(vector[0], v1) or np.array_equal(vector[0], v2):
                 candidates.append((vector[1][0], vector[1][1]))
             if np.array_equal(vector[1], v1) or np.array_equal(vector[1], v2):
@@ -97,38 +112,55 @@ def get_orientation_marks(points):
     try:
         origin = np.array([k for k, v in collections.Counter(candidates).items() if v == 2])[0]
     except:
-        return no_result
+        return None
     
-    log("origin: {0}".format(origin))
-    
-    vx, vy = find_vx_vy(hull, origin, v1, v2)
-    
-    log("vx: {0}, vy: {1}".format(vx, vy))
-    
-    return (origin, vx, vy)
+    return find_vx_vy_new(np.array([origin,v1,v2]))
 
-def find_vx_vy(hull, origin, v1, v2):    
+def find_vx_vy_new(m):
     """
-    Given the convex hull of points, the origin and two vectors v1 and v2, 
-    determine whether v1 == vx && v2 == vy or vice versa.
-    """
-    # find the index of the origin in the points list
-    origin_index = 0
-    for v in hull.vertices:
-        if np.array_equal(hull.points[v], origin):
-            origin_index = v
+    Given three points (origin, v1, v2), finds out which of v1, v2 is vx and vy.
     
-    # roll the vertices to start with the origin. vx will always be to the right of the origin, vy will be left
-    verts = np.roll(hull.vertices, -np.asscalar(np.where(hull.vertices == origin_index)[0]))
-
-    for v in verts:
-        if np.array_equal(hull.points[v], v1):
-            return v1, v2
-            
-        if np.array_equal(hull.points[v], v2):
-            return v2, v1
-            vx = v2
-
+    Input: A 2x3 matrix (origin, v1, v2)
+    Output: A 2x3 matrix (origin, vx, vy)
+    """
+    
+    # The standard coordinate system
+    positive_x = np.array([1,0])
+    positive_y = np.array([0,1])
+    real_origin = np.array([0,0])
+    
+    # The origin of our touchcode system
+    origin = m[0]
+    
+    # Translate the touchcode coordinate system to have its origin at the standard origin (0,0)
+    translation_vec = real_origin - origin
+    mt = m + translation_vec
+    
+    v1, v2 = mt[1], mt[2]
+    log("v1 is {0}".format(v1))
+    
+    # Pick v1 as a pivot and check if it is in first or fourth quadrant.
+    # If so, rotate by angle(v1, positive_y) to align v2 with the x-axis.
+    # Next, check whether v2 has the same orientation as the positive x-axis, v1 then being vx. 
+    # In the other case, v1 is the vx.
+    if v_same_orientation(v1, positive_x):
+        log("v1 is oriented with positive_x")
+        angle = v_angle(v1, positive_y)
+        log("angle: {0}".format(angle))
+        v1 = v_rotate(v1, angle)
+        v2 = v_rotate(v2, angle)
+    else:
+        log("v1 is NOT oriented with positive_x")
+        angle = 360 - v_angle(v1, positive_y)
+        v1 = v_rotate(v1, angle)
+        v2 = v_rotate(v2, angle)
+    
+    log(v_same_orientation(v2, positive_x))
+    log("after rot: v1 = {0} and v2 = {1}".format(v1, v2))
+    if v_same_orientation(v2, positive_x):
+        return np.array([m[0],m[2],m[1]])
+    else:
+        return m
 
 def norm(reference, point):
     """Given a reference system (o, vx, vy), normalize a set of points to new coordinates."""

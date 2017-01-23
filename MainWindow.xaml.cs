@@ -16,7 +16,7 @@ namespace WpfTouchFrameSample
         private int _threshold = 15;
         private int _currentTouchcode = -1;
 
-        private TouchcodePythonAPI _touchcodeAPI;
+        private TouchcodeNativeAPI _touchcodeAPI;
 
         private Dictionary<int, TouchPoint> touchPointMap = new Dictionary<int, TouchPoint>();
         private List<TouchPoint> touchPointList = new List<TouchPoint>();
@@ -26,7 +26,6 @@ namespace WpfTouchFrameSample
 
         public delegate void UpdateTextCallback(string text);
 
-
         public MainWindow()
         {
             InitializeComponent();
@@ -34,10 +33,7 @@ namespace WpfTouchFrameSample
             var window = Window.GetWindow(this);
             window.KeyDown += OnKeyDown;
 
-            _touchcodeAPI = new TouchcodePythonAPI();
-            _touchcodeAPI.CheckIfTouchcodeAPIWorks();
-
-            var myApi = new TouchcodeNativeAPI();
+            _touchcodeAPI = new TouchcodeNativeAPI();
         }
 
 
