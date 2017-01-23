@@ -516,5 +516,26 @@ namespace WpfApplication4.Tests
 
             Assert.AreEqual(sameOrientation, a.HasSameOrientationAs(b));
         }
+
+        [Test]
+        public void ShouldRecognizeTouchcode0x001()
+        {
+            // Arrange
+            List<Point2D> points = new List<Point2D> {
+                new Point2D(306, 501),
+                new Point2D(300, 647),
+                new Point2D(445, 660),
+                new Point2D(362, 507)
+            };
+
+            // System Under Test
+            var api = new TouchcodeNativeAPI();
+
+            // Act
+            var touchcode = api.Check(points);
+
+            // Assert
+            Assert.AreEqual(0x001, touchcode);
+        }
     }
 }

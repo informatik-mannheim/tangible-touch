@@ -90,7 +90,7 @@ namespace WpfApplication4.Touchcode
             vy = (vy / vy.Length) / vy.Length * 3;
 
             var xcor = vx.DotProduct(so);
-            var ycor = vx.DotProduct(so);
+            var ycor = vy.DotProduct(so);
 
             return new Point2D(Math.Round(xcor, 1), Math.Round(ycor, 1));
         }
