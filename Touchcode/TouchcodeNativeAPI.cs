@@ -69,9 +69,29 @@ namespace WpfApplication4.Touchcode
 
             var referenceSystem = GetReferenceSystem(touchpoints);
 
+            if(referenceSystem == null)
+            {
+                return -1;
+            }
 
+            var newTouchpoints = touchpoints.Select(point => Normalize(referenceSystem, point)).ToList();
 
-            return -1;
+            return MapPointsToTouchcode(newTouchpoints);
+        }
+
+        private Point2D Normalize(Tuple<Point2D, Point2D, Point2D> referenceSystem, Point2D point)
+        {
+            var vx = referenceSystem.Item2 - referenceSystem.Item1;
+            var vy = referenceSystem.Item3 - referenceSystem.Item1;
+            var so = point - referenceSystem.Item1;
+
+            vx = (vx / vx.Length) / vx.Length * 3;
+            vy = (vy / vy.Length) / vy.Length * 3;
+
+            var xcor = vx.DotProduct(so);
+            var ycor = vx.DotProduct(so);
+
+            return new Point2D(Math.Round(xcor, 1), Math.Round(ycor, 1));
         }
 
         public Tuple<Point2D, Point2D, Point2D> GetReferenceSystem(IList<Point2D> touchPoints)
@@ -109,13 +129,12 @@ namespace WpfApplication4.Touchcode
             try
             {
                 origin = candidates.GroupBy(c => c.GetHashCode()).Where(g => g.Count() == 2).Select(g => g).FirstOrDefault().FirstOrDefault();
+                return FindVxVyIn(new Tuple<Point2D, Point2D, Point2D>(origin, v1, v2));
             }
             catch (Exception)
             {
-                origin = new Point2D(-1, -1);
+                return null;
             }
-
-            return FindVxVyIn(new Tuple<Point2D, Point2D, Point2D>(origin, v1, v2));
         }
 
         private Tuple<Point2D, Point2D, Point2D> FindVxVyIn(Tuple<Point2D, Point2D, Point2D> referenceSystem)
@@ -144,12 +163,6 @@ namespace WpfApplication4.Touchcode
             {
                 return new Tuple<Point2D, Point2D, Point2D>(origin, referenceSystem.Item2, referenceSystem.Item3);
             }
-        }
-
-
-        public string Serialize(List<TouchPoint> touchPoints)
-        {
-            throw new NotImplementedException();
         }
 
         public int MapPointsToTouchcode(List<Point2D> touchPoints)

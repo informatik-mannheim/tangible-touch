@@ -191,7 +191,7 @@ namespace WpfApplication4.Tests
             // Act + Assert
             foreach (var sample in samplesInvalid)
             {
-                Assert.AreEqual(api.Check(sample), -1);
+                Assert.AreEqual(-1, api.Check(sample));
             }
         }
 
