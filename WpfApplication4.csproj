@@ -85,8 +85,8 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Tests\ExplorationTests.cs" />
     <Compile Include="Touchcode\InvalidTouchPointsException.cs" />
-    <Compile Include="Touchcode\ITouchcodeAPI.cs" />
     <Compile Include="Tests\TouchcodeNativeAPITests.cs" />
     <Compile Include="Touchcode\FakeTouchPoint.cs" />
     <Compile Include="Touchcode\IHaveNoTouchDevice.cs" />

@@ -8,7 +8,7 @@ using System.Windows.Input;
 
 namespace WpfApplication4.Touchcode
 {
-    class TouchcodePythonAPI : ITouchcodeAPI
+    class TouchcodePythonAPI
     {
         public string _example = "[(0,0),(0,3),(1,3),(2,3),(0,2),(1,2),(2,2),(3,2),(0,1),(1,1),(2,1),(3,1),(1,0),(2,0),(3,0)]";
 
@@ -85,7 +85,7 @@ namespace WpfApplication4.Touchcode
 
                 Console.WriteLine(string.Format("Touchcode API is {0}", Check(tps) == 16 ? "working" : "NOT working"));
             }
-            catch (TouchcodeSubprocessException ex)
+            catch (TouchcodeSubprocessException)
             {
                 Console.WriteLine("Touchcode API is NOT working");
             }
