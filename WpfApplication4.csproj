@@ -35,6 +35,12 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="MathNet.Numerics">
+      <HintPath>packages\MathNet.Numerics.3.17.0\lib\net40\MathNet.Numerics.dll</HintPath>
+    </Reference>
+    <Reference Include="MathNet.Spatial">
+      <HintPath>packages\MathNet.Spatial.0.3.0\lib\net40\MathNet.Spatial.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.QualityTools.Testing.Fakes, Version=11.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
     <Reference Include="nunit.core">
       <HintPath>packages\NUnitTestAdapter.2.0.0\lib\nunit.core.dll</HintPath>
@@ -79,14 +85,13 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="Geometry\Touchcode.cs" />
-    <Compile Include="InvalidTouchPointsException.cs" />
-    <Compile Include="Tests\TestMinimumBoundingRectangle.cs" />
-    <Compile Include="Tests\TestTouchcode.cs" />
-    <Compile Include="Tests\TestVectorStuff.cs" />
-    <Compile Include="Tests\TouchpointsTests.cs" />
-    <Compile Include="TouchcodeAPI.cs" />
-    <Compile Include="Touchpoints.cs" />
+    <Compile Include="Tests\ExplorationTests.cs" />
+    <Compile Include="Touchcode\InvalidTouchPointsException.cs" />
+    <Compile Include="Tests\TouchcodeNativeAPITests.cs" />
+    <Compile Include="Touchcode\FakeTouchPoint.cs" />
+    <Compile Include="Touchcode\IHaveNoTouchDevice.cs" />
+    <Compile Include="Touchcode\TouchcodePythonAPI.cs" />
+    <Compile Include="Touchcode\TouchcodeNativeAPI.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -101,13 +106,6 @@
     <Compile Include="Component1.Designer.cs">
       <DependentUpon>Component1.cs</DependentUpon>
     </Compile>
-    <Compile Include="Geometry\Elements\Line2d.cs" />
-    <Compile Include="Geometry\Elements\Polygon2d.cs" />
-    <Compile Include="Geometry\Elements\Rectangle2d.cs" />
-    <Compile Include="Geometry\Elements\Segment2d.cs" />
-    <Compile Include="Geometry\Elements\Vector2d.cs" />
-    <Compile Include="Geometry\GeoAlgos.cs" />
-    <Compile Include="Geometry\MinimalBoundingBox.cs" />
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
@@ -145,6 +143,7 @@
   <ItemGroup>
     <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
