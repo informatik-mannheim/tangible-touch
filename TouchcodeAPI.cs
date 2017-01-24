@@ -8,6 +8,9 @@ using System.Windows.Input;
 
 namespace WpfApplication4
 {
+    /// <summary>
+    /// API to check for Touchcodes.
+    /// </summary>
     public class TouchcodeAPI
     {
         private Dictionary<Point2D, int> _touchpointMap = new Dictionary<Point2D, int> {
@@ -25,6 +28,14 @@ namespace WpfApplication4
             { new Point2D(2, 0), 0x800 },
         };
 
+
+        /// <summary>
+        /// Checks a list of <see cref="TouchPoint">TouchPoints</see> for the existence of a touchcode. If the TouchPoints contained no Touchcode, Touchcode.None is returned.
+        /// </summary>
+        /// <param name="touchPoints"></param>
+        /// <param name="xMirror">A flag to enable or disable xMirroring. Set to true when the y coordinates of the screen grow from top to bottom. Defaults to true.</param>
+        /// <param name="maxY">The number of pixels on the y-axis of the screen. Only needs to be set when <paramref name="xMirror"/> is set to true. Defaults to 1080.</param>
+        /// <returns>A <see cref="Touchcode">Touchcode</see> instance.</returns>
         public Touchcode Check(IList<TouchPoint> touchPoints, bool xMirror = true, int maxY = 1080)
         {
             return Check(touchPoints.Select(point => new Point2D(point.Position.X, point.Position.Y)).ToList(), xMirror, maxY);
@@ -44,12 +55,12 @@ namespace WpfApplication4
 
             var referenceSystem = GetReferenceSystem(touchpoints);
 
-            if(referenceSystem == null)
+            if (referenceSystem == null)
             {
                 return Touchcode.None;
             }
 
-            var touchcodeValue =  MapPointsToTouchcode(touchpoints.Select(point => Normalize(referenceSystem, point)));
+            var touchcodeValue = MapPointsToTouchcode(touchpoints.Select(point => Normalize(referenceSystem, point)));
 
 
             var o = new Point2D(referenceSystem.Item1.X, 1080 - referenceSystem.Item1.Y);
@@ -63,6 +74,63 @@ namespace WpfApplication4
             var angle = oy.SignedAngleTo(py, true);
 
             return new Touchcode(touchcodeValue, angle.Degrees, o, x, y);
+        }
+
+
+        public Tuple<Point2D, Point2D, Point2D> GetReferenceSystem(IList<Point2D> touchPoints)
+        {
+            double maxDeviationLength = 0.08;
+
+            var longestDistance = touchPoints
+                .Combinations(2)
+                .Select(points => new Tuple<IList<Point2D>, double>(points.ToList(), points.ToList()[0].DistanceTo(points.ToList()[1])))
+                .OrderByDescending(t => t.Item2).FirstOrDefault();
+
+            var v1 = longestDistance.Item1[0];
+            var v2 = longestDistance.Item1[1];
+
+            foreach (var point in touchPoints)
+            {
+                var pv1 = point - v1;
+                var pv2 = point - v2;
+
+                if (pv1.IsPerpendicularTo(pv2, 5.001)
+                    && pv1.LengthAlmostEqual(longestDistance.Item2 / Constants.Sqrt2, maxDeviationLength)
+                    && pv2.LengthAlmostEqual(longestDistance.Item2 / Constants.Sqrt2, maxDeviationLength))
+                {
+                    return FindVxVyIn(new Tuple<Point2D, Point2D, Point2D>(point, v1, v2));
+                }
+            }
+
+            return null;
+        }
+
+        private Tuple<Point2D, Point2D, Point2D> FindVxVyIn(Tuple<Point2D, Point2D, Point2D> referenceSystem)
+        {
+            var positiveXAxis = new Vector2D(1, 0);
+            var positiveYAxis = new Vector2D(0, 1);
+            var realOrigin = new Point2D(0, 0);
+
+            var origin = referenceSystem.Item1;
+
+            var translationVector = realOrigin - origin;
+
+            var v1 = (referenceSystem.Item2 + translationVector).ToVector2D();
+            var v2 = (referenceSystem.Item3 + translationVector).ToVector2D();
+
+            var angle = v1.SignedAngleTo(positiveYAxis, false, false);
+
+            v1 = v1.Rotate(angle);
+            v2 = v2.Rotate(angle);
+
+            if (v2.HasSameOrientationAs(positiveXAxis))
+            {
+                return new Tuple<Point2D, Point2D, Point2D>(origin, referenceSystem.Item3, referenceSystem.Item2);
+            }
+            else
+            {
+                return new Tuple<Point2D, Point2D, Point2D>(origin, referenceSystem.Item2, referenceSystem.Item3);
+            }
         }
 
         private Point2D Normalize(Tuple<Point2D, Point2D, Point2D> referenceSystem, Point2D point)
@@ -80,81 +148,11 @@ namespace WpfApplication4
             return new Point2D(Math.Round(xcor, 1), Math.Round(ycor, 1));
         }
 
-        public Tuple<Point2D, Point2D, Point2D> GetReferenceSystem(IList<Point2D> touchPoints)
-        {
-            double threshold = 0.10;
-
-            var vectors = touchPoints.Combinations(2);
-
-            var distances = vectors
-                .Select(points => new Tuple<IList<Point2D>, double>(points.ToList(), points.ToList()[0].DistanceTo(points.ToList()[1])));
-
-            var longestDistance = distances.OrderByDescending(t => t.Item2).FirstOrDefault();
-            var v1 = longestDistance.Item1[0];
-            var v2 = longestDistance.Item1[1];
-
-            IList<Point2D> candidates = new List<Point2D>();
-
-            foreach (var distance in distances)
-            {
-                if (Precision.AlmostEqual(longestDistance.Item2 / Constants.Sqrt2, distance.Item2, (longestDistance.Item2 / Constants.Sqrt2) * threshold))
-                {
-                    if (distance.Item1[0] == v1 || distance.Item1[0] == v2)
-                    {
-                        candidates.Add(distance.Item1[1]);
-                    }
-                    else if (distance.Item1[1] == v1 || distance.Item1[1] == v2)
-                    {
-                        candidates.Add(distance.Item1[0]);
-                    }
-                }
-            }
-
-            var origin = candidates.GroupBy(c => c.GetHashCode()).Where(g => g.Count() == 2).Select(g => g).FirstOrDefault();
-
-            if(origin != null)
-            {
-                return FindVxVyIn(new Tuple<Point2D, Point2D, Point2D>(origin.First(), v1, v2));
-            }
-            else
-            {
-                return null;
-            }
-        }
-
-        private Tuple<Point2D, Point2D, Point2D> FindVxVyIn(Tuple<Point2D, Point2D, Point2D> referenceSystem)
-        {
-            var positiveXAxis = new Vector2D(1, 0);
-            var positiveYAxis = new Vector2D(0, 1);
-            var realOrigin = new Point2D(0, 0);
-
-            var origin = referenceSystem.Item1;
-            
-            var translationVector = realOrigin - origin;
-            
-            var v1 = (referenceSystem.Item2 + translationVector).ToVector2D();
-            var v2 = (referenceSystem.Item3 + translationVector).ToVector2D();
-
-            var angle = v1.SignedAngleTo(positiveYAxis, false, false);
-
-            v1 = v1.Rotate(angle);
-            v2 = v2.Rotate(angle);
-
-            if(v2.HasSameOrientationAs(positiveXAxis))
-            {
-                return new Tuple<Point2D, Point2D, Point2D>(origin, referenceSystem.Item3, referenceSystem.Item2);
-            }
-            else
-            {
-                return new Tuple<Point2D, Point2D, Point2D>(origin, referenceSystem.Item2, referenceSystem.Item3);
-            }
-        }
-
         public int MapPointsToTouchcode(IEnumerable<Point2D> touchPoints)
         {
             var threshold = 0.2001;
             var touchcode = 0;
-            
+
             _touchpointMap.ToList().ForEach(map => touchcode |= touchPoints.Any(tp => tp.AlmostEqual(map.Key, threshold)) ? map.Value : 0);
 
             return touchcode;
@@ -191,6 +189,11 @@ namespace WpfApplication4
         public static bool AlmostEqual(this Point2D thisPoint, Point2D thatPoint, double threshold)
         {
             return Precision.AlmostEqual(thisPoint.X, thatPoint.X, threshold) && Precision.AlmostEqual(thisPoint.Y, thatPoint.Y, threshold);
+        }
+
+        public static bool LengthAlmostEqual(this Vector2D thisPoint, double length, double thresholdInPercent)
+        {
+            return Precision.AlmostEqual(thisPoint.Length, length, length * thresholdInPercent);
         }
 
         public static bool HasSameOrientationAs(this Vector2D thisVector, Vector2D otherVector)
