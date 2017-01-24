@@ -7,7 +7,7 @@ using MathNet.Spatial.Euclidean;
 using System.Linq;
 using System.Text;
 
-namespace WpfApplication4.Touchcode
+namespace WpfApplication4
 {
     public class TouchcodeAPI
     {
@@ -28,16 +28,16 @@ namespace WpfApplication4.Touchcode
             { new Point2D(2, 0), 0x800 },
         };
 
-        public int Check(IList<TouchPoint> touchPoints, bool xMirror = true, int maxY = 1080)
+        public Touchcode Check(IList<TouchPoint> touchPoints, bool xMirror = true, int maxY = 1080)
         {
             return Check(touchPoints.Select(point => new Point2D(point.Position.X, point.Position.Y)).ToList(), xMirror, maxY);
         }
 
-        public int Check(IList<Point2D> touchpoints, bool xMirror = true, int maxY = 1080)
+        public Touchcode Check(IList<Point2D> touchpoints, bool xMirror = true, int maxY = 1080)
         {
             if (touchpoints == null || touchpoints.Count < 3)
             {
-                return NO_TOUCHCODE;
+                return Touchcode.None;
             }
 
             if (xMirror)
@@ -49,10 +49,11 @@ namespace WpfApplication4.Touchcode
 
             if(referenceSystem == null)
             {
-                return NO_TOUCHCODE;
+                return Touchcode.None;
             }
 
-            return MapPointsToTouchcode(touchpoints.Select(point => Normalize(referenceSystem, point)));
+            var touchcodeValue =  MapPointsToTouchcode(touchpoints.Select(point => Normalize(referenceSystem, point)));
+            return new Touchcode(touchcodeValue, 0, referenceSystem.Item2, referenceSystem.Item3);
         }
 
         private Point2D Normalize(Tuple<Point2D, Point2D, Point2D> referenceSystem, Point2D point)

@@ -8,7 +8,7 @@ using System.Windows;
 using System.Windows.Input;
 using System.Threading;
 using MathNet.Spatial.Euclidean;
-using WpfApplication4.Touchcode;
+using WpfApplication4;
 
 namespace WpfApplication4.Tests
 {
@@ -113,7 +113,7 @@ namespace WpfApplication4.Tests
             var touchcode = api.Check(touchpoints);
 
             // Assert
-            Assert.AreEqual(touchcode, -1);
+            Assert.AreEqual(touchcode, Touchcode.None);
         }
 
         [Test]
@@ -129,15 +129,15 @@ namespace WpfApplication4.Tests
             var touchcode = api.Check(touchpoints);
 
             // Assert
-            Assert.AreEqual(touchcode, -1);
+            Assert.AreEqual(touchcode, Touchcode.None);
 
             touchpoints.Add(new Point2D(0, 0));
             touchcode = api.Check(touchpoints);
-            Assert.AreEqual(touchcode, -1);
+            Assert.AreEqual(touchcode, Touchcode.None);
 
             touchpoints.Add(new Point2D(0, 0));
             touchcode = api.Check(touchpoints);
-            Assert.AreEqual(touchcode, -1);
+            Assert.AreEqual(touchcode, Touchcode.None);
         }
 
         [Test]
@@ -149,7 +149,7 @@ namespace WpfApplication4.Tests
             // Act + Assert
             foreach (var sample in _samples0x80)
             {
-                Assert.AreEqual(api.Check(sample), 0x80);
+                Assert.AreEqual(api.Check(sample).Value, 0x80);
             }
         }
 
@@ -162,7 +162,7 @@ namespace WpfApplication4.Tests
             // Act + Assert
             foreach (var sample in _samples0x10)
             {
-                Assert.AreEqual(api.Check(sample), 0x10);
+                Assert.AreEqual(api.Check(sample).Value, 0x10);
             }
         }
 
@@ -191,7 +191,7 @@ namespace WpfApplication4.Tests
             // Act + Assert
             foreach (var sample in samplesInvalid)
             {
-                Assert.AreEqual(-1, api.Check(sample));
+                Assert.AreEqual(Touchcode.None, api.Check(sample));
             }
         }
 
@@ -535,7 +535,7 @@ namespace WpfApplication4.Tests
             var touchcode = api.Check(points);
 
             // Assert
-            Assert.AreEqual(0x001, touchcode);
+            Assert.AreEqual(0x001, touchcode.Value);
         }
     }
 }

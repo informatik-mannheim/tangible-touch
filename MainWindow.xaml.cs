@@ -3,7 +3,10 @@ using System.Windows;
 using System.Windows.Input;
 using System.Collections.Generic;
 using WpfApplication4;
-using WpfApplication4.Touchcode;
+using System.Windows.Media;
+using System.Windows.Shapes;
+using System.Windows.Controls;
+using MathNet.Spatial.Euclidean;
 
 namespace WpfTouchFrameSample
 {
@@ -33,9 +36,37 @@ namespace WpfTouchFrameSample
             var window = Window.GetWindow(this);
             window.KeyDown += OnKeyDown;
 
+            var vy = new Point2D(552, 647);
+            var vx = new Point2D(363, 572);
+            var o = new Point2D(423, 707);
+
+            var width = o.DistanceTo(vx);
+            var height = o.DistanceTo(vy);
+
+            //DrawRect(width,height, o, 20);
+
             _touchcodeAPI = new TouchcodeAPI();
         }
 
+
+        private Rectangle DrawRect(double width, double height, Point2D origin, double rotationAngle)
+        {
+            var rect = new Rectangle() {
+                Width = width,
+                Height = height,
+                Stroke = new SolidColorBrush(Color.FromRgb(0, 0, 0)),
+                RenderTransform = new RotateTransform(45, Width / 2, Height / 2),
+                
+            };
+
+           
+            Canvas.SetLeft(rect, origin.X);
+            Canvas.SetTop(rect, origin.Y);
+
+            canvas.Children.Add(rect);
+
+            return rect;
+        }
 
         void OnTouchDown(object sender, TouchEventArgs e)
         {
@@ -81,7 +112,7 @@ namespace WpfTouchFrameSample
 
                 // check touchcode
 
-                _currentTouchcode = _touchcodeAPI.Check(touchPointList);
+                _currentTouchcode = _touchcodeAPI.Check(touchPointList).Value;
 
                 Console.WriteLine("OnTouchDown [" + touchPointList.Count + "]");
 
@@ -124,7 +155,7 @@ namespace WpfTouchFrameSample
                         // decrease number of touch points
                         touchPointList.Remove(touchPoint);
 
-                        _currentTouchcode = _touchcodeAPI.Check(touchPointList);
+                        _currentTouchcode = _touchcodeAPI.Check(touchPointList).Value;
 
                         Console.WriteLine("OnTouchUp [" + touchPointList.Count + "]");
 

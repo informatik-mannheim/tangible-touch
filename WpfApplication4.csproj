@@ -70,7 +70,8 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Tests\TouchcodeNativeAPITests.cs" />
-    <Compile Include="Touchcode\TouchcodeNativeAPI.cs" />
+    <Compile Include="Touchcode.cs" />
+    <Compile Include="TouchcodeAPI.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
