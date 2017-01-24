@@ -1,14 +1,13 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.IO;
 using System.Windows;
 using System.Windows.Input;
-using System.Collections.Generic;
-using WpfApplication4;
-using System.Windows.Media;
-using System.Windows.Shapes;
-using System.Windows.Controls;
-using System.Linq;
-using MathNet.Spatial.Euclidean;
 using System.Windows.Media.Animation;
+using System.Windows.Shapes;
+using WpfApplication4;
+using System.Linq;
+using Path = System.IO.Path;
 
 namespace WpfTouchFrameSample
 {
@@ -16,45 +15,46 @@ namespace WpfTouchFrameSample
     {
         private List<TouchPoint> _touchPointList = new List<TouchPoint>();
 
-        private Touchcode _currentTouchcode = Touchcode.None;
+        private Touchcode _currentTouchcode;
         private TouchcodeAPI _touchcodeAPI;
-        
+
         public MainWindow()
         {
             InitializeComponent();
 
-            Window.GetWindow(this).KeyDown += OnKeyDown;
-
             _touchcodeAPI = new TouchcodeAPI();
+            _currentTouchcode = Touchcode.None;
 
             updateText();
         }
 
+        private void updateText()
+        {
+            xaml_touchpoints.Text = String.Format("{0} TouchPoints @ {1}", _touchPointList.Count, _touchcodeAPI.Serialize(_touchPointList));
+            xaml_touchcode_value.Text = _currentTouchcode.ToString();
+        }
 
         void OnTouchDown(object sender, TouchEventArgs e)
         {
             grid.CaptureTouch(e.TouchDevice);
 
             _touchPointList.Add(e.TouchDevice.GetTouchPoint(grid));
-            
-            _currentTouchcode = _touchcodeAPI.Check(_touchPointList);
-            
-            updateText();
 
-            e.Handled = true;
+            _currentTouchcode = _touchcodeAPI.Check(_touchPointList);
+
+            updateText();
         }
 
         void OnTouchUp(object sender, TouchEventArgs e)
         {
             var touchpoint = e.GetTouchPoint(grid);
-            _touchPointList.RemoveAll(p => p.TouchDevice == touchpoint.TouchDevice);
 
+            _touchPointList.RemoveAll(p => p.TouchDevice == touchpoint.TouchDevice);
             _currentTouchcode = _touchcodeAPI.Check(_touchPointList);
 
             updateText();
-            
+
             grid.ReleaseTouchCapture(e.TouchDevice);
-            e.Handled = true;
         }
 
         private void OnKeyDown(object sender, KeyEventArgs e)
@@ -62,10 +62,16 @@ namespace WpfTouchFrameSample
             if (e.Key.ToString().Equals("S"))
             {
                 Flash(150);
-                Console.WriteLine(_touchcodeAPI.Serialize(_touchPointList));
+                WriteSampleToTempLogFile();
             }
+        }
 
-            e.Handled = true;
+        private void WriteSampleToTempLogFile()
+        {
+            using (StreamWriter file = new StreamWriter(String.Format(@"{0}/touchcode_log.txt", Path.GetTempPath()), true))
+            {
+                file.WriteLine(_touchcodeAPI.Serialize(_touchPointList));
+            }
         }
 
         private void Flash(int milliseconds)
@@ -83,15 +89,6 @@ namespace WpfTouchFrameSample
             Storyboard flashStoryboard = new Storyboard();
             flashStoryboard.Children.Add(animation);
             flashStoryboard.Begin(grid);
-        }
-
-        private void updateText()
-        {
-            xaml_touchpoints.Clear();
-            xaml_touchcode_value.Clear();
-
-            xaml_touchpoints.AppendText(String.Format("{0} TouchPoints @ {1}", _touchPointList.Count, _touchcodeAPI.Serialize(_touchPointList)));
-            xaml_touchcode_value.AppendText(_currentTouchcode.ToString());
         }
     }
 }

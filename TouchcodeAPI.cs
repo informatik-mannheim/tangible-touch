@@ -1,11 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Windows.Input;
-using MathNet.Numerics;
-using MathNet.Spatial;
+﻿using MathNet.Numerics;
 using MathNet.Spatial.Euclidean;
+using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Windows.Input;
 
 namespace WpfApplication4
 {
@@ -111,14 +110,13 @@ namespace WpfApplication4
                 }
             }
 
-            Point2D origin;
+            var origin = candidates.GroupBy(c => c.GetHashCode()).Where(g => g.Count() == 2).Select(g => g).FirstOrDefault();
 
-            try
+            if(origin != null)
             {
-                origin = candidates.GroupBy(c => c.GetHashCode()).Where(g => g.Count() == 2).Select(g => g).FirstOrDefault().FirstOrDefault();
-                return FindVxVyIn(new Tuple<Point2D, Point2D, Point2D>(origin, v1, v2));
+                return FindVxVyIn(new Tuple<Point2D, Point2D, Point2D>(origin.First(), v1, v2));
             }
-            catch (Exception)
+            else
             {
                 return null;
             }

@@ -1,14 +1,7 @@
-﻿using NUnit.Framework;
-using System;
+﻿using MathNet.Spatial.Euclidean;
+using NUnit.Framework;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Input;
 using System.Threading;
-using MathNet.Spatial.Euclidean;
-using WpfApplication4;
 
 namespace WpfApplication4.Tests
 {
