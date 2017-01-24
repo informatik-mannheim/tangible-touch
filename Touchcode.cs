@@ -25,5 +25,10 @@ namespace WpfApplication4
         public Point2D X { get; private set; }
         public Point2D Y { get; private set; }
         public Point2D O { get; private set; }
+
+        public override string ToString()
+        {
+            return Value.ToString();
+        }
     }
 }

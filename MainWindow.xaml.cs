@@ -14,6 +14,7 @@ namespace WpfTouchFrameSample
     {
         private Object thisLock = new Object();
 
+        private Rectangle _currentRectangle = new Rectangle();
         private int _countTouches = 0;
         private int _countDistances = 0;
         private int _threshold = 15;
@@ -46,7 +47,7 @@ namespace WpfTouchFrameSample
                 Width = width,
                 Height = height,
                 Stroke = new SolidColorBrush(Color.FromRgb(0, 0, 0)),
-                RenderTransform = new RotateTransform(45, Width / 2, Height / 2),
+                RenderTransform = new RotateTransform(rotationAngle, Width / 2, Height / 2),
                 
             };
            
@@ -192,7 +193,11 @@ namespace WpfTouchFrameSample
                 var width = _currentTouchcode.O.DistanceTo(_currentTouchcode.X);
                 var height = _currentTouchcode.O.DistanceTo(_currentTouchcode.Y);
 
-                DrawRect(width, height, _currentTouchcode.O, _currentTouchcode.Angle);
+                if(_currentTouchcode != Touchcode.None)
+                {
+                    canvas.Children.Remove(_currentRectangle);
+                    _currentRectangle = DrawRect(width, height, _currentTouchcode.O, _currentTouchcode.Angle);
+                }
             }
         }
 
