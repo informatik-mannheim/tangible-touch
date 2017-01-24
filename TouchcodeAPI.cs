@@ -11,8 +11,6 @@ namespace WpfApplication4
 {
     public class TouchcodeAPI
     {
-        private int NO_TOUCHCODE = -1;
-
         private Dictionary<Point2D, int> _touchpointMap = new Dictionary<Point2D, int> {
             { new Point2D(1, 3), 0x001 },
             { new Point2D(2, 3), 0x002 },
