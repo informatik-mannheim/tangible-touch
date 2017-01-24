@@ -17,7 +17,7 @@ namespace WpfTouchFrameSample
         private int _countTouches = 0;
         private int _countDistances = 0;
         private int _threshold = 15;
-        private int _currentTouchcode = -1;
+        private Touchcode _currentTouchcode = Touchcode.None;
 
         private TouchcodeAPI _touchcodeAPI;
 
@@ -36,15 +36,6 @@ namespace WpfTouchFrameSample
             var window = Window.GetWindow(this);
             window.KeyDown += OnKeyDown;
 
-            var vy = new Point2D(552, 647);
-            var vx = new Point2D(363, 572);
-            var o = new Point2D(423, 707);
-
-            var width = o.DistanceTo(vx);
-            var height = o.DistanceTo(vy);
-
-            //DrawRect(width,height, o, 20);
-
             _touchcodeAPI = new TouchcodeAPI();
         }
 
@@ -58,7 +49,6 @@ namespace WpfTouchFrameSample
                 RenderTransform = new RotateTransform(45, Width / 2, Height / 2),
                 
             };
-
            
             Canvas.SetLeft(rect, origin.X);
             Canvas.SetTop(rect, origin.Y);
@@ -112,7 +102,7 @@ namespace WpfTouchFrameSample
 
                 // check touchcode
 
-                _currentTouchcode = _touchcodeAPI.Check(touchPointList).Value;
+                _currentTouchcode = _touchcodeAPI.Check(touchPointList);
 
                 Console.WriteLine("OnTouchDown [" + touchPointList.Count + "]");
 
@@ -155,7 +145,7 @@ namespace WpfTouchFrameSample
                         // decrease number of touch points
                         touchPointList.Remove(touchPoint);
 
-                        _currentTouchcode = _touchcodeAPI.Check(touchPointList).Value;
+                        _currentTouchcode = _touchcodeAPI.Check(touchPointList);
 
                         Console.WriteLine("OnTouchUp [" + touchPointList.Count + "]");
 
@@ -198,6 +188,11 @@ namespace WpfTouchFrameSample
                 {
                     xaml_distances.AppendText("\n" + "Distance between the Points " + distance);
                 }
+
+                var width = _currentTouchcode.O.DistanceTo(_currentTouchcode.X);
+                var height = _currentTouchcode.O.DistanceTo(_currentTouchcode.Y);
+
+                DrawRect(width, height, _currentTouchcode.O, _currentTouchcode.Angle);
             }
         }
 

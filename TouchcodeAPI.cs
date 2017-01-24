@@ -53,7 +53,18 @@ namespace WpfApplication4
             }
 
             var touchcodeValue =  MapPointsToTouchcode(touchpoints.Select(point => Normalize(referenceSystem, point)));
-            return new Touchcode(touchcodeValue, 0, referenceSystem.Item2, referenceSystem.Item3);
+
+
+            var o = new Point2D(referenceSystem.Item1.X, 1080 - referenceSystem.Item1.Y);
+
+            var py = new Vector2D(0, 1);
+
+            var angle = o.ToVector2D().SignedAngleTo(py, true);
+
+            var x = new Point2D(referenceSystem.Item2.X, 1080 - referenceSystem.Item2.Y);
+            var y = new Point2D(referenceSystem.Item3.X, 1080 - referenceSystem.Item3.Y);
+
+            return new Touchcode(touchcodeValue, angle.Degrees, o, x, y);
         }
 
         private Point2D Normalize(Tuple<Point2D, Point2D, Point2D> referenceSystem, Point2D point)
