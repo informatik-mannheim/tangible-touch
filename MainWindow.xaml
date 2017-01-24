@@ -2,15 +2,11 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="MainWindow" Height="1032" Width="2236" WindowState="Maximized">
-    
-    <Grid x:Name="grid1" Margin="0,0,190,156" TouchDown="OnTouchDown" TouchUp="OnTouchUp" IsManipulationEnabled="False" Width="59.77265033600158cm" Height="33.6221158140009cm" Background="LightGray">
+
+    <Grid x:Name="grid" TouchDown="OnTouchDown" TouchUp="OnTouchUp"  IsManipulationEnabled="False" Width="59.77265033600158cm" Height="33.6221158140009cm" Background="#F57C00">
         <Canvas x:Name="canvas" Background="Transparent" Panel.ZIndex="1000" />
-        
-        <RichTextBox x:Name="xaml_number_of_touchpoints" FontSize="40" 
-                 Background="Honeydew" Margin="658,254,1404.124,816.757" Height="200"/>
-        <RichTextBox x:Name="xaml_xy_coordinates" FontSize="10"
-                 Background="Beige" Width="200" Margin="928,54,1131.124,465.757"/>
-        <RichTextBox x:Name="xaml_distances" FontSize="10" 
-                 Background="PowderBlue" Width="200" Margin="1140,54,919.124,465.757"/>
+        <TextBox x:Name="xaml_touchcode_label" FontSize="50" Margin="10,0,1743.124,1207.757" Background="Transparent" FontFamily="Consolas" BorderThickness="0">>>Touchcode: </TextBox>
+        <TextBox x:Name="xaml_touchcode_value" FontSize="50" Margin="354,1,1281.124,1207.757" Background="Transparent" FontFamily="Consolas" BorderThickness="0">[None]</TextBox>
+        <TextBox x:Name="xaml_touchpoints" FontSize="20" Height="30" Background="Transparent" FontFamily="Consolas" BorderThickness="0" Margin="10,68,1061.124,1172.757"></TextBox>
     </Grid>
 </Window>

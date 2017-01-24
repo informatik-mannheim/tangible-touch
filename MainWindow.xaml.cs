@@ -7,6 +7,7 @@ using System.Windows.Media;
 using System.Windows.Shapes;
 using System.Windows.Controls;
 using MathNet.Spatial.Euclidean;
+using System.Windows.Media.Animation;
 
 namespace WpfTouchFrameSample
 {
@@ -14,20 +15,14 @@ namespace WpfTouchFrameSample
     {
         private Object thisLock = new Object();
 
-        private Rectangle _currentRectangle = new Rectangle();
-        private int _countTouches = 0;
-        private int _countDistances = 0;
         private int _threshold = 15;
-        private Touchcode _currentTouchcode = Touchcode.None;
 
-        private TouchcodeAPI _touchcodeAPI;
-
-        private Dictionary<int, TouchPoint> touchPointMap = new Dictionary<int, TouchPoint>();
         private List<TouchPoint> touchPointList = new List<TouchPoint>();
 
-        private Dictionary<int, double> distanceMap = new Dictionary<int, double>();
-        private List<Double> distanceList = new List<Double>();
-
+        private Rectangle _currentRectangle = new Rectangle();
+        private Touchcode _currentTouchcode = Touchcode.None;
+        private TouchcodeAPI _touchcodeAPI;
+        
         public delegate void UpdateTextCallback(string text);
 
         public MainWindow()
@@ -38,8 +33,26 @@ namespace WpfTouchFrameSample
             window.KeyDown += OnKeyDown;
 
             _touchcodeAPI = new TouchcodeAPI();
+
+            updateText();
         }
 
+        private void Flash(int milliseconds)
+        {
+            var animation = new DoubleAnimation
+            {
+                AutoReverse = true,
+                From = 1,
+                To = 0,
+                Duration = new TimeSpan(0, 0, 0, 0, milliseconds)
+            };
+
+            Storyboard.SetTargetName(animation, grid.Name);
+            Storyboard.SetTargetProperty(animation, new PropertyPath(Shape.OpacityProperty));
+            Storyboard flashStoryboard = new Storyboard();
+            flashStoryboard.Children.Add(animation);
+            flashStoryboard.Begin(grid);
+        }
 
         private Rectangle DrawRect(double width, double height, Point2D origin, double rotationAngle)
         {
@@ -66,7 +79,7 @@ namespace WpfTouchFrameSample
             if (element == null) { return; }
 
             element.CaptureTouch(e.TouchDevice);
-            var touchPoint = new MyTouchpoint(e.TouchDevice.GetTouchPoint(this.grid1));
+            var touchPoint = new MyTouchpoint(e.TouchDevice.GetTouchPoint(this.grid));
 
             updateOnTouchDown(touchPoint);
             e.Handled = true;
@@ -74,10 +87,6 @@ namespace WpfTouchFrameSample
 
         void OnTouchUp(object sender, TouchEventArgs e)
         {
-            xaml_number_of_touchpoints.Document.Blocks.Clear();
-            xaml_xy_coordinates.Document.Blocks.Clear();
-            xaml_distances.Document.Blocks.Clear();
-
             FrameworkElement element = sender as FrameworkElement;
 
             if (element == null) { return; }
@@ -107,24 +116,21 @@ namespace WpfTouchFrameSample
 
                 Console.WriteLine("OnTouchDown [" + touchPointList.Count + "]");
 
-                // calculate distance with minimum 2 touch points
-                calcDistance();
-
                 updateText();
             }
         }
 
-        private void OnKeyDown(object sender, System.Windows.Input.KeyEventArgs e)
+        private void OnKeyDown(object sender, KeyEventArgs e)
         {
             if (e.Key.ToString().Equals("S"))
             {
+                Flash(150);
                 Console.WriteLine(_touchcodeAPI.Serialize(touchPointList));
             }
             else if (e.Key.ToString().Equals("C"))
             {
                 touchPointList.Clear();
                 updateText();
-                xaml_number_of_touchpoints.Document.Blocks.Clear();
             }
         }
 
@@ -150,9 +156,6 @@ namespace WpfTouchFrameSample
 
                         Console.WriteLine("OnTouchUp [" + touchPointList.Count + "]");
 
-                        // calculate distance with minimum 2 touch points
-                        calcDistance();
-
                         updateText();
 
                         // return because the foreach won't recognize the updated number of elements
@@ -171,65 +174,11 @@ namespace WpfTouchFrameSample
 
         private void updateText()
         {
-            xaml_xy_coordinates.Document.Blocks.Clear();
+            xaml_touchpoints.Clear();
+            xaml_touchcode_value.Clear();
 
-            xaml_xy_coordinates.AppendText(string.Format("Current Touchcode is: {0}\n\n", _currentTouchcode));
-
-            foreach (MyTouchpoint touchPoint in touchPointList)
-            {
-                xaml_number_of_touchpoints.Document.Blocks.Clear();
-
-                xaml_number_of_touchpoints.AppendText(touchPointList.Count.ToString());
-                xaml_xy_coordinates.AppendText(touchPoint.ToString());
-                
-
-                xaml_distances.Document.Blocks.Clear();
-
-                foreach (Double distance in distanceList)
-                {
-                    xaml_distances.AppendText("\n" + "Distance between the Points " + distance);
-                }
-
-                var width = _currentTouchcode.O.DistanceTo(_currentTouchcode.X);
-                var height = _currentTouchcode.O.DistanceTo(_currentTouchcode.Y);
-
-                if(_currentTouchcode != Touchcode.None)
-                {
-                    canvas.Children.Remove(_currentRectangle);
-                    _currentRectangle = DrawRect(width, height, _currentTouchcode.O, _currentTouchcode.Angle);
-                }
-            }
-        }
-
-        private void calcDistance()
-        {
-            // calculating the distances new with the touch points which left...
-            distanceList = new List<Double>();
-
-            if (_countTouches >= 2)
-            {
-                for (int i = 0; i < touchPointList.Count; i++)
-                {
-                    // get first touchpoint
-                    TouchPoint p1 = touchPointList[i];
-                    for (int j = i + 1; j < touchPointList.Count; j++)
-                    {
-                        // get second touchpoint
-                        TouchPoint p2 = touchPointList[j];
-                        // calulate distance
-                        Double distance = Math.Sqrt(Math.Pow(p2.Position.X - p1.Position.X, 2) + Math.Pow(p2.Position.Y - p1.Position.Y, 2));
-                        if (!(distanceList.Contains(distance)))
-                        {
-                            // add distance value to map
-                            distanceList.Add(distance);
-                            // increase number of distances
-                            _countDistances++;
-                            xaml_distances.AppendText("\n" + "Distance between the Points " + distance);
-                        }
-                    }
-                }
-            }
-
+            xaml_touchcode_value.AppendText(_currentTouchcode.ToString());
+            xaml_touchpoints.AppendText(String.Format("{0} TouchPoints @ {1}", touchPointList.Count, _touchcodeAPI.Serialize(touchPointList)));
         }
 
         public class MyTouchpoint : TouchPoint

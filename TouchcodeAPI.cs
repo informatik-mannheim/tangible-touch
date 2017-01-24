@@ -56,13 +56,14 @@ namespace WpfApplication4
 
 
             var o = new Point2D(referenceSystem.Item1.X, 1080 - referenceSystem.Item1.Y);
+            var x = new Point2D(referenceSystem.Item2.X, 1080 - referenceSystem.Item2.Y);
+            var y = new Point2D(referenceSystem.Item3.X, 1080 - referenceSystem.Item3.Y);
+
+            var oy = o - y;
 
             var py = new Vector2D(0, 1);
 
-            var angle = o.ToVector2D().SignedAngleTo(py, true);
-
-            var x = new Point2D(referenceSystem.Item2.X, 1080 - referenceSystem.Item2.Y);
-            var y = new Point2D(referenceSystem.Item3.X, 1080 - referenceSystem.Item3.Y);
+            var angle = oy.SignedAngleTo(py, true);
 
             return new Touchcode(touchcodeValue, angle.Degrees, o, x, y);
         }

@@ -28,7 +28,7 @@ namespace WpfApplication4
 
         public override string ToString()
         {
-            return Value.ToString();
+            return this == None ? "[None]" : String.Format("0x{0:X} ({1:0.00}°)", Value, Angle);
         }
     }
 }
