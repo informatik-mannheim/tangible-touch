@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace WpfApplication4.Properties {
+namespace TangibleTouch.Properties {
     
     
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]

@@ -3,7 +3,7 @@ using NUnit.Framework;
 using System.Collections.Generic;
 using System.Threading;
 
-namespace WpfApplication4.Tests
+namespace TangibleTouch.Tests
 {
     [TestFixture]
     [Apartment(ApartmentState.STA)]
@@ -360,8 +360,8 @@ namespace WpfApplication4.Tests
 
             // Assert
             Assert.AreEqual(touchpoints[0], referenceSystem.Item1);
-            Assert.AreEqual(touchpoints[1], referenceSystem.Item2);
-            Assert.AreEqual(touchpoints[2], referenceSystem.Item3);
+            Assert.AreEqual(touchpoints[1].ToVector2D(), referenceSystem.Item2);
+            Assert.AreEqual(touchpoints[2].ToVector2D(), referenceSystem.Item3);
         }
 
         [Test]
@@ -375,6 +375,10 @@ namespace WpfApplication4.Tests
                 new Point2D(0, 0)
             };
 
+            var origin = touchpoints[3];
+            var expectedVx = touchpoints[2] - origin;
+            var expectedVy = touchpoints[1] - origin;
+
             // System Under Test
             var api = new TouchcodeAPI();
 
@@ -383,8 +387,8 @@ namespace WpfApplication4.Tests
 
             // Assert
             Assert.AreEqual(touchpoints[3], referenceSystem.Item1);
-            Assert.AreEqual(touchpoints[2], referenceSystem.Item2);
-            Assert.AreEqual(touchpoints[1], referenceSystem.Item3);
+            Assert.AreEqual(expectedVx, referenceSystem.Item2);
+            Assert.AreEqual(expectedVy, referenceSystem.Item3);
         }
 
         [Test]
@@ -398,6 +402,11 @@ namespace WpfApplication4.Tests
                 new Point2D(3, 3)
             };
 
+            // Arrange
+            var origin = touchpoints[1];
+            var expectedVx = touchpoints[3] - origin;
+            var expectedVy = touchpoints[0] - origin;
+
             // System Under Test
             var api = new TouchcodeAPI();
 
@@ -405,9 +414,9 @@ namespace WpfApplication4.Tests
             var referenceSystem = api.GetReferenceSystem(touchpoints);
 
             // Assert
-            Assert.AreEqual(touchpoints[1], referenceSystem.Item1);
-            Assert.AreEqual(touchpoints[3], referenceSystem.Item2);
-            Assert.AreEqual(touchpoints[0], referenceSystem.Item3);
+            Assert.AreEqual(origin, referenceSystem.Item1);
+            Assert.AreEqual(expectedVx, referenceSystem.Item2);
+            Assert.AreEqual(expectedVy, referenceSystem.Item3);
         }
 
         [Test]
@@ -423,6 +432,11 @@ namespace WpfApplication4.Tests
                 new Point2D(0, 1)
             };
 
+            // Arrange
+            var origin = touchpoints[2];
+            var expectedVx = touchpoints[0] - origin;
+            var expectedVy = touchpoints[1] - origin;
+
             // System Under Test
             var api = new TouchcodeAPI();
 
@@ -430,9 +444,9 @@ namespace WpfApplication4.Tests
             var referenceSystem = api.GetReferenceSystem(touchpoints);
 
             // Assert
-            Assert.AreEqual(touchpoints[2], referenceSystem.Item1);
-            Assert.AreEqual(touchpoints[0], referenceSystem.Item2);
-            Assert.AreEqual(touchpoints[1], referenceSystem.Item3);
+            Assert.AreEqual(origin, referenceSystem.Item1);
+            Assert.AreEqual(expectedVx, referenceSystem.Item2);
+            Assert.AreEqual(expectedVy, referenceSystem.Item3);
         }
 
         [Test]
@@ -447,6 +461,11 @@ namespace WpfApplication4.Tests
                 new Point2D(1, 1)
             };
 
+            // Arrange
+            var origin = touchpoints[1];
+            var expectedVx = touchpoints[0] - origin;
+            var expectedVy = touchpoints[2] - origin;
+
             // System Under Test
             var api = new TouchcodeAPI();
 
@@ -454,9 +473,9 @@ namespace WpfApplication4.Tests
             var referenceSystem = api.GetReferenceSystem(touchpoints);
 
             // Assert
-            Assert.AreEqual(touchpoints[1], referenceSystem.Item1);
-            Assert.AreEqual(touchpoints[0], referenceSystem.Item2);
-            Assert.AreEqual(touchpoints[2], referenceSystem.Item3);
+            Assert.AreEqual(origin, referenceSystem.Item1);
+            Assert.AreEqual(expectedVx, referenceSystem.Item2);
+            Assert.AreEqual(expectedVy, referenceSystem.Item3);
         }
 
         [Test]
@@ -467,13 +486,18 @@ namespace WpfApplication4.Tests
 
             foreach(var sample in _samples0x80)
             {
+                // Arrange
+                var origin = sample[3];
+                var expectedVx = sample[1] - origin;
+                var expectedVy = sample[0] - origin;
+                
                 // Act
                 var referenceSystem = api.GetReferenceSystem(sample);
 
                 // Assert
-                Assert.AreEqual(sample[3], referenceSystem.Item1);
-                Assert.AreEqual(sample[1], referenceSystem.Item2);
-                Assert.AreEqual(sample[0], referenceSystem.Item3);
+                Assert.AreEqual(origin, referenceSystem.Item1);
+                Assert.AreEqual(expectedVx, referenceSystem.Item2);
+                Assert.AreEqual(expectedVy, referenceSystem.Item3);
             }
         }
 
@@ -485,13 +509,18 @@ namespace WpfApplication4.Tests
 
             foreach (var sample in _samples0x10)
             {
+                // Arrange
+                var origin = sample[3];
+                var expectedVx = sample[1] - origin;
+                var expectedVy = sample[0] - origin;
+
                 // Act
                 var referenceSystem = api.GetReferenceSystem(sample);
 
                 // Assert
-                Assert.AreEqual(sample[3], referenceSystem.Item1);
-                Assert.AreEqual(sample[1], referenceSystem.Item2);
-                Assert.AreEqual(sample[0], referenceSystem.Item3);
+                Assert.AreEqual(origin, referenceSystem.Item1);
+                Assert.AreEqual(expectedVx, referenceSystem.Item2);
+                Assert.AreEqual(expectedVy, referenceSystem.Item3);
             }
         }
 

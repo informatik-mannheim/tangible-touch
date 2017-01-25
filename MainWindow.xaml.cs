@@ -5,7 +5,7 @@ using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media.Animation;
 using System.Windows.Shapes;
-using WpfApplication4;
+using TangibleTouch;
 using System.Linq;
 using Path = System.IO.Path;
 

@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Windows.Input;
 
-namespace WpfApplication4
+namespace TangibleTouch
 {
     /// <summary>
     /// API to check for Touchcodes.
@@ -30,17 +30,30 @@ namespace WpfApplication4
 
 
         /// <summary>
-        /// Checks a list of <see cref="TouchPoint">TouchPoints</see> for the existence of a touchcode. If the TouchPoints contained no Touchcode, Touchcode.None is returned.
+        /// Checks a list of <see cref="TouchPoint">TouchPoints</see> for the existence of a touchcode. 
+        /// If the TouchPoints contained no Touchcode, Touchcode.None is returned.
         /// </summary>
-        /// <param name="touchPoints"></param>
-        /// <param name="xMirror">A flag to enable or disable xMirroring. Set to true when the y coordinates of the screen grow from top to bottom. Defaults to true.</param>
-        /// <param name="maxY">The number of pixels on the y-axis of the screen. Only needs to be set when <paramref name="xMirror"/> is set to true. Defaults to 1080.</param>
+        /// <param name="touchPoints">A list of <see cref="TouchPoint">TouchPoint</see> instances.</param>
+        /// <param name="xMirror">A flag to enable or disable xMirroring. Set to true when the y coordinates of the screen 
+        /// grow from top to bottom. Defaults to true.</param>
+        /// <param name="maxY">The number of pixels on the y-axis of the screen. 
+        /// Only needs to be set when <paramref name="xMirror"/> is set to true. Defaults to 1080.</param>
         /// <returns>A <see cref="Touchcode">Touchcode</see> instance.</returns>
         public Touchcode Check(IList<TouchPoint> touchPoints, bool xMirror = true, int maxY = 1080)
         {
             return Check(touchPoints.Select(point => new Point2D(point.Position.X, point.Position.Y)).ToList(), xMirror, maxY);
         }
 
+        /// <summary>
+        /// Checks a list of <see cref="Point2D">Points</see> for the existence of a touchcode. 
+        /// If the Points contained no Touchcode, Touchcode.None is returned.
+        /// </summary>
+        /// <param name="touchPoints">A list of <see cref="Point2D"/> instances.</param>
+        /// <param name="xMirror">A flag to enable or disable xMirroring. Set to true when the y coordinates of the screen 
+        /// grow from top to bottom. Defaults to true.</param>
+        /// <param name="maxY">The number of pixels on the y-axis of the screen. 
+        /// Only needs to be set when <paramref name="xMirror"/> is set to true. Defaults to 1080.</param>
+        /// <returns>A <see cref="Touchcode">Touchcode</see> instance.</returns>
         public Touchcode Check(IList<Point2D> touchpoints, bool xMirror = true, int maxY = 1080)
         {
             if (touchpoints == null || touchpoints.Count < 3)
@@ -64,20 +77,18 @@ namespace WpfApplication4
 
 
             var o = new Point2D(referenceSystem.Item1.X, 1080 - referenceSystem.Item1.Y);
-            var x = new Point2D(referenceSystem.Item2.X, 1080 - referenceSystem.Item2.Y);
             var y = new Point2D(referenceSystem.Item3.X, 1080 - referenceSystem.Item3.Y);
 
             var oy = o - y;
-
             var py = new Vector2D(0, 1);
 
             var angle = oy.SignedAngleTo(py, true);
 
-            return new Touchcode(touchcodeValue, angle.Degrees, o, x, y);
+            return new Touchcode(touchcodeValue, angle.Degrees, o);
         }
 
 
-        public Tuple<Point2D, Point2D, Point2D> GetReferenceSystem(IList<Point2D> touchPoints)
+        public Tuple<Point2D, Vector2D, Vector2D> GetReferenceSystem(IList<Point2D> touchPoints)
         {
             double maxDeviationLength = 0.08;
 
@@ -91,52 +102,46 @@ namespace WpfApplication4
 
             foreach (var point in touchPoints)
             {
-                var pv1 = point - v1;
-                var pv2 = point - v2;
+                var pv1 = v1 - point;
+                var pv2 = v2 - point;
 
                 if (pv1.IsPerpendicularTo(pv2, 5.001)
                     && pv1.LengthAlmostEqual(longestDistance.Item2 / Constants.Sqrt2, maxDeviationLength)
                     && pv2.LengthAlmostEqual(longestDistance.Item2 / Constants.Sqrt2, maxDeviationLength))
                 {
-                    return FindVxVyIn(new Tuple<Point2D, Point2D, Point2D>(point, v1, v2));
+                    return FindVxVyIn(new Tuple<Point2D, Vector2D, Vector2D>(point, pv1, pv2));
                 }
             }
 
             return null;
         }
 
-        private Tuple<Point2D, Point2D, Point2D> FindVxVyIn(Tuple<Point2D, Point2D, Point2D> referenceSystem)
+        private Tuple<Point2D, Vector2D, Vector2D> FindVxVyIn(Tuple<Point2D, Vector2D, Vector2D> referenceSystem)
         {
             var positiveXAxis = new Vector2D(1, 0);
             var positiveYAxis = new Vector2D(0, 1);
-            var realOrigin = new Point2D(0, 0);
 
             var origin = referenceSystem.Item1;
 
-            var translationVector = realOrigin - origin;
-
-            var v1 = (referenceSystem.Item2 + translationVector).ToVector2D();
-            var v2 = (referenceSystem.Item3 + translationVector).ToVector2D();
+            var v1 = referenceSystem.Item2;
+            var v2 = referenceSystem.Item3;
 
             var angle = v1.SignedAngleTo(positiveYAxis, false, false);
 
-            v1 = v1.Rotate(angle);
-            v2 = v2.Rotate(angle);
-
-            if (v2.HasSameOrientationAs(positiveXAxis))
+            if (v2.Rotate(angle).HasSameOrientationAs(positiveXAxis))
             {
-                return new Tuple<Point2D, Point2D, Point2D>(origin, referenceSystem.Item3, referenceSystem.Item2);
+                return new Tuple<Point2D, Vector2D, Vector2D>(origin, v2, v1);
             }
             else
             {
-                return new Tuple<Point2D, Point2D, Point2D>(origin, referenceSystem.Item2, referenceSystem.Item3);
+                return new Tuple<Point2D, Vector2D, Vector2D>(origin, v1, v2);
             }
         }
 
-        private Point2D Normalize(Tuple<Point2D, Point2D, Point2D> referenceSystem, Point2D point)
+        private Point2D Normalize(Tuple<Point2D, Vector2D, Vector2D> referenceSystem, Point2D point)
         {
-            var vx = referenceSystem.Item2 - referenceSystem.Item1;
-            var vy = referenceSystem.Item3 - referenceSystem.Item1;
+            var vx = referenceSystem.Item2;
+            var vy = referenceSystem.Item3;
             var so = point - referenceSystem.Item1;
 
             vx = (vx / vx.Length) / vx.Length * 3;
