@@ -356,12 +356,12 @@ namespace TangibleTouch.Tests
             var api = new TouchcodeAPI();
 
             // Act
-            var referenceSystem = api.GetReferenceSystem(touchpoints);
+            var referenceSystem = api.ExtractReferenceSystemFrom(touchpoints);
 
             // Assert
-            Assert.AreEqual(touchpoints[0], referenceSystem.Item1);
-            Assert.AreEqual(touchpoints[1].ToVector2D(), referenceSystem.Item2);
-            Assert.AreEqual(touchpoints[2].ToVector2D(), referenceSystem.Item3);
+            Assert.AreEqual(touchpoints[0], referenceSystem.Origin);
+            Assert.AreEqual(touchpoints[1].ToVector2D(), referenceSystem.Vx);
+            Assert.AreEqual(touchpoints[2].ToVector2D(), referenceSystem.Vy);
         }
 
         [Test]
@@ -383,12 +383,12 @@ namespace TangibleTouch.Tests
             var api = new TouchcodeAPI();
 
             // Act
-            var referenceSystem = api.GetReferenceSystem(touchpoints);
+            var referenceSystem = api.ExtractReferenceSystemFrom(touchpoints);
 
             // Assert
-            Assert.AreEqual(touchpoints[3], referenceSystem.Item1);
-            Assert.AreEqual(expectedVx, referenceSystem.Item2);
-            Assert.AreEqual(expectedVy, referenceSystem.Item3);
+            Assert.AreEqual(touchpoints[3], referenceSystem.Origin);
+			Assert.AreEqual(expectedVx, referenceSystem.Vx);
+            Assert.AreEqual(expectedVy, referenceSystem.Vy);
         }
 
         [Test]
@@ -411,12 +411,12 @@ namespace TangibleTouch.Tests
             var api = new TouchcodeAPI();
 
             // Act
-            var referenceSystem = api.GetReferenceSystem(touchpoints);
+            var referenceSystem = api.ExtractReferenceSystemFrom(touchpoints);
 
             // Assert
-            Assert.AreEqual(origin, referenceSystem.Item1);
-            Assert.AreEqual(expectedVx, referenceSystem.Item2);
-            Assert.AreEqual(expectedVy, referenceSystem.Item3);
+            Assert.AreEqual(origin, referenceSystem.Origin);
+            Assert.AreEqual(expectedVx, referenceSystem.Vx);
+            Assert.AreEqual(expectedVy, referenceSystem.Vy);
         }
 
         [Test]
@@ -441,12 +441,12 @@ namespace TangibleTouch.Tests
             var api = new TouchcodeAPI();
 
             // Act
-            var referenceSystem = api.GetReferenceSystem(touchpoints);
+            var referenceSystem = api.ExtractReferenceSystemFrom(touchpoints);
 
             // Assert
-            Assert.AreEqual(origin, referenceSystem.Item1);
-            Assert.AreEqual(expectedVx, referenceSystem.Item2);
-            Assert.AreEqual(expectedVy, referenceSystem.Item3);
+            Assert.AreEqual(origin, referenceSystem.Origin);
+            Assert.AreEqual(expectedVx, referenceSystem.Vx);
+            Assert.AreEqual(expectedVy, referenceSystem.Vy);
         }
 
         [Test]
@@ -470,12 +470,12 @@ namespace TangibleTouch.Tests
             var api = new TouchcodeAPI();
 
             // Act
-            var referenceSystem = api.GetReferenceSystem(touchpoints);
+            var referenceSystem = api.ExtractReferenceSystemFrom(touchpoints);
 
             // Assert
-            Assert.AreEqual(origin, referenceSystem.Item1);
-            Assert.AreEqual(expectedVx, referenceSystem.Item2);
-            Assert.AreEqual(expectedVy, referenceSystem.Item3);
+            Assert.AreEqual(origin, referenceSystem.Origin);
+            Assert.AreEqual(expectedVx, referenceSystem.Vx);
+            Assert.AreEqual(expectedVy, referenceSystem.Vy);
         }
 
         [Test]
@@ -492,12 +492,12 @@ namespace TangibleTouch.Tests
                 var expectedVy = sample[0] - origin;
                 
                 // Act
-                var referenceSystem = api.GetReferenceSystem(sample);
+                var referenceSystem = api.ExtractReferenceSystemFrom(sample);
 
                 // Assert
-                Assert.AreEqual(origin, referenceSystem.Item1);
-                Assert.AreEqual(expectedVx, referenceSystem.Item2);
-                Assert.AreEqual(expectedVy, referenceSystem.Item3);
+                Assert.AreEqual(origin, referenceSystem.Origin);
+                Assert.AreEqual(expectedVx, referenceSystem.Vx);
+                Assert.AreEqual(expectedVy, referenceSystem.Vy);
             }
         }
 
@@ -515,12 +515,12 @@ namespace TangibleTouch.Tests
                 var expectedVy = sample[0] - origin;
 
                 // Act
-                var referenceSystem = api.GetReferenceSystem(sample);
+                var referenceSystem = api.ExtractReferenceSystemFrom(sample);
 
                 // Assert
-                Assert.AreEqual(origin, referenceSystem.Item1);
-                Assert.AreEqual(expectedVx, referenceSystem.Item2);
-                Assert.AreEqual(expectedVy, referenceSystem.Item3);
+                Assert.AreEqual(origin, referenceSystem.Origin);
+                Assert.AreEqual(expectedVx, referenceSystem.Vx);
+                Assert.AreEqual(expectedVy, referenceSystem.Vy);
             }
         }
 

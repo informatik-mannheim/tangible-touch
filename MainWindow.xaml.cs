@@ -11,84 +11,84 @@ using Path = System.IO.Path;
 
 namespace WpfTouchFrameSample
 {
-    public partial class MainWindow : Window
-    {
-        private List<TouchPoint> _touchPointList = new List<TouchPoint>();
+	public partial class MainWindow : Window
+	{
+		private List<TouchPoint> _touchPointList = new List<TouchPoint>();
 
-        private Touchcode _currentTouchcode;
-        private TouchcodeAPI _touchcodeAPI;
+		private Touchcode _currentTouchcode;
+		private TouchcodeAPI _touchcodeAPI;
 
-        public MainWindow()
-        {
-            InitializeComponent();
+		public MainWindow()
+		{
+			InitializeComponent();
 
-            _touchcodeAPI = new TouchcodeAPI();
-            _currentTouchcode = Touchcode.None;
+			_touchcodeAPI = new TouchcodeAPI();
+			_currentTouchcode = Touchcode.None;
 
-            updateText();
-        }
+			updateText();
+		}
 
-        private void updateText()
-        {
-            xaml_touchpoints.Text = String.Format("{0} TouchPoints @ {1}", _touchPointList.Count, _touchcodeAPI.Serialize(_touchPointList));
-            xaml_touchcode_value.Text = _currentTouchcode.ToString();
-        }
+		private void updateText()
+		{
+			xaml_touchpoints.Text = String.Format("{0} TouchPoints @ {1}", _touchPointList.Count, _touchcodeAPI.Serialize(_touchPointList));
+			xaml_touchcode_value.Text = _currentTouchcode.ToString();
+		}
 
-        void OnTouchDown(object sender, TouchEventArgs e)
-        {
-            grid.CaptureTouch(e.TouchDevice);
+		void OnTouchDown(object sender, TouchEventArgs e)
+		{
+			grid.CaptureTouch(e.TouchDevice);
 
-            _touchPointList.Add(e.TouchDevice.GetTouchPoint(grid));
+			_touchPointList.Add(e.TouchDevice.GetTouchPoint(grid));
 
-            _currentTouchcode = _touchcodeAPI.Check(_touchPointList);
+			_currentTouchcode = _touchcodeAPI.Check(_touchPointList);
+			
+			updateText();
+		}
 
-            updateText();
-        }
+		void OnTouchUp(object sender, TouchEventArgs e)
+		{
+			var touchpoint = e.GetTouchPoint(grid);
 
-        void OnTouchUp(object sender, TouchEventArgs e)
-        {
-            var touchpoint = e.GetTouchPoint(grid);
+			_touchPointList.RemoveAll(p => p.TouchDevice == touchpoint.TouchDevice);
+			_currentTouchcode = _touchcodeAPI.Check(_touchPointList);
 
-            _touchPointList.RemoveAll(p => p.TouchDevice == touchpoint.TouchDevice);
-            _currentTouchcode = _touchcodeAPI.Check(_touchPointList);
+			updateText();
 
-            updateText();
+			grid.ReleaseTouchCapture(e.TouchDevice);
+		}
 
-            grid.ReleaseTouchCapture(e.TouchDevice);
-        }
+		private void OnKeyDown(object sender, KeyEventArgs e)
+		{
+			if (e.Key.ToString().Equals("S"))
+			{
+				Flash(150);
+				WriteSampleToTempLogFile();
+			}
+		}
 
-        private void OnKeyDown(object sender, KeyEventArgs e)
-        {
-            if (e.Key.ToString().Equals("S"))
-            {
-                Flash(150);
-                WriteSampleToTempLogFile();
-            }
-        }
+		private void WriteSampleToTempLogFile()
+		{
+			using (StreamWriter file = new StreamWriter(String.Format(@"{0}/touchcode_log.txt", Path.GetTempPath()), true))
+			{
+				file.WriteLine(_touchcodeAPI.Serialize(_touchPointList));
+			}
+		}
 
-        private void WriteSampleToTempLogFile()
-        {
-            using (StreamWriter file = new StreamWriter(String.Format(@"{0}/touchcode_log.txt", Path.GetTempPath()), true))
-            {
-                file.WriteLine(_touchcodeAPI.Serialize(_touchPointList));
-            }
-        }
+		private void Flash(int milliseconds)
+		{
+			var animation = new DoubleAnimation
+			{
+				AutoReverse = true,
+				From = 1,
+				To = 0,
+				Duration = new TimeSpan(0, 0, 0, 0, milliseconds)
+			};
 
-        private void Flash(int milliseconds)
-        {
-            var animation = new DoubleAnimation
-            {
-                AutoReverse = true,
-                From = 1,
-                To = 0,
-                Duration = new TimeSpan(0, 0, 0, 0, milliseconds)
-            };
-
-            Storyboard.SetTargetName(animation, grid.Name);
-            Storyboard.SetTargetProperty(animation, new PropertyPath(Shape.OpacityProperty));
-            Storyboard flashStoryboard = new Storyboard();
-            flashStoryboard.Children.Add(animation);
-            flashStoryboard.Begin(grid);
-        }
-    }
+			Storyboard.SetTargetName(animation, grid.Name);
+			Storyboard.SetTargetProperty(animation, new PropertyPath(Shape.OpacityProperty));
+			Storyboard flashStoryboard = new Storyboard();
+			flashStoryboard.Children.Add(animation);
+			flashStoryboard.Begin(grid);
+		}
+	}
 }
