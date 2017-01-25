@@ -94,11 +94,12 @@ namespace TangibleTouch
 
             var longestDistance = touchPoints
                 .Combinations(2)
-                .Select(points => new Tuple<IList<Point2D>, double>(points.ToList(), points.ToList()[0].DistanceTo(points.ToList()[1])))
-                .OrderByDescending(t => t.Item2).FirstOrDefault();
+                .Select(points => new Tuple<Point2D, Point2D, double>(points.ElementAt(0), points.ElementAt(1), points.ElementAt(0).DistanceTo(points.ElementAt(1))))
+                .OrderByDescending(t => t.Item3)
+                .FirstOrDefault();
 
-            var v1 = longestDistance.Item1[0];
-            var v2 = longestDistance.Item1[1];
+            var v1 = longestDistance.Item1;
+            var v2 = longestDistance.Item2;
 
             foreach (var point in touchPoints)
             {
@@ -106,36 +107,27 @@ namespace TangibleTouch
                 var pv2 = v2 - point;
 
                 if (pv1.IsPerpendicularTo(pv2, 5.001)
-                    && pv1.LengthAlmostEqual(longestDistance.Item2 / Constants.Sqrt2, maxDeviationLength)
-                    && pv2.LengthAlmostEqual(longestDistance.Item2 / Constants.Sqrt2, maxDeviationLength))
+                    && pv1.LengthAlmostEqual(longestDistance.Item3 / Constants.Sqrt2, maxDeviationLength)
+                    && pv2.LengthAlmostEqual(longestDistance.Item3 / Constants.Sqrt2, maxDeviationLength))
                 {
-                    return FindVxVyIn(new Tuple<Point2D, Vector2D, Vector2D>(point, pv1, pv2));
+                    return FindVxVyIn(point, pv1, pv2);
                 }
             }
 
             return null;
         }
 
-        private Tuple<Point2D, Vector2D, Vector2D> FindVxVyIn(Tuple<Point2D, Vector2D, Vector2D> referenceSystem)
+        private Tuple<Point2D, Vector2D, Vector2D> FindVxVyIn(Point2D origin, Vector2D v1, Vector2D v2)
         {
             var positiveXAxis = new Vector2D(1, 0);
             var positiveYAxis = new Vector2D(0, 1);
 
-            var origin = referenceSystem.Item1;
-
-            var v1 = referenceSystem.Item2;
-            var v2 = referenceSystem.Item3;
-
             var angle = v1.SignedAngleTo(positiveYAxis, false, false);
 
-            if (v2.Rotate(angle).HasSameOrientationAs(positiveXAxis))
-            {
-                return new Tuple<Point2D, Vector2D, Vector2D>(origin, v2, v1);
-            }
-            else
-            {
-                return new Tuple<Point2D, Vector2D, Vector2D>(origin, v1, v2);
-            }
+            var vx = v2.Rotate(angle).HasSameOrientationAs(positiveXAxis) ? v2 : v1;
+            var vy = (vx == v1) ? v2 : v1;
+
+            return new Tuple<Point2D, Vector2D, Vector2D>(origin, vx, vy); 
         }
 
         private Point2D Normalize(Tuple<Point2D, Vector2D, Vector2D> referenceSystem, Point2D point)
@@ -172,11 +164,7 @@ namespace TangibleTouch
         {
             StringBuilder builder = new StringBuilder("[");
 
-            for (int i = 0; i < touchpoints.Count; i++)
-            {
-                var tp = touchpoints[i];
-                builder.AppendFormat("({0},{1}){2}", tp.Position.X, tp.Position.Y, i == touchpoints.Count - 1 ? "" : ",");
-            }
+            touchpoints.ForEach(p => builder.AppendFormat("({0},{1}){2}", p.Position.X, p.Position.Y, p.Equals(touchpoints.Last()) ? "" : ","));
 
             return builder.Append("]").ToString();
         }
