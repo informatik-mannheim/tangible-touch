@@ -142,7 +142,7 @@ namespace TangibleTouch.Tests
             // Act + Assert
             foreach (var sample in _samples0x80)
             {
-                Assert.AreEqual(api.Check(sample).Value, 0x80);
+                Assert.AreEqual(0x80, api.Check(sample).Value);
             }
         }
 
@@ -155,7 +155,7 @@ namespace TangibleTouch.Tests
             // Act + Assert
             foreach (var sample in _samples0x10)
             {
-                Assert.AreEqual(api.Check(sample).Value, 0x10);
+                Assert.AreEqual(0x10, api.Check(sample).Value);
             }
         }
 

@@ -130,15 +130,12 @@ namespace TangibleTouch
 
 		private Point2D Normalize(ReferenceSystem referenceSystem, Point2D point)
 		{
-			var so = point - referenceSystem.Origin;
+			var oPoint = point - referenceSystem.Origin;
 
-			var vx = (referenceSystem.Vx / referenceSystem.Vx.Length) / referenceSystem.Vx.Length * 3;
-			var vy = (referenceSystem.Vy / referenceSystem.Vy.Length) / referenceSystem.Vy.Length * 3;
-
-			var xcor = vx.DotProduct(so);
-			var ycor = vy.DotProduct(so);
-
-			return new Point2D(Math.Round(xcor, 1), Math.Round(ycor, 1));
+			var xcor = referenceSystem.Vx.Normalize().DotProduct(oPoint / referenceSystem.Vx.Length) * 3;
+			var ycor = referenceSystem.Vy.Normalize().DotProduct(oPoint / referenceSystem.Vy.Length) * 3;
+			
+			return new Point2D(xcor, ycor);
 		}
 
 		public int MapPointsToTouchcode(IEnumerable<Point2D> touchPoints)
