@@ -87,6 +87,8 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="InvalidReferenceSystem.cs" />
+    <Compile Include="ReferenceSystem.cs" />
     <Compile Include="Tests\TouchcodeNativeAPITests.cs" />
     <Compile Include="Touchcode.cs" />
     <Compile Include="TouchcodeAPI.cs" />

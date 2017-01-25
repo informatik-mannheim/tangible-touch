@@ -193,12 +193,13 @@ namespace TangibleTouch.Tests
         {
             // Arrange
             var touchpoints = new List<Point2D>();
+			var referenceSystem = new ReferenceSystem(new Point2D(0, 0), new Vector2D(3, 0), new Vector2D(0, 3));
 
             // System Under Test
             var api = new TouchcodeAPI();
 
             // Act
-            var touchcode = api.MapPointsToTouchcode(touchpoints);
+			var touchcode = referenceSystem.MapPointsToTouchcode(touchpoints).Value;
 
             // Assert
             Assert.AreEqual(touchcode, 0);
@@ -224,13 +225,13 @@ namespace TangibleTouch.Tests
             };
 
             // System Under Test
-            var api = new TouchcodeAPI();
+			var referenceSystem = new ReferenceSystem(new Point2D(0, 0), new Vector2D(3, 0), new Vector2D(0, 3));
 
             // Act
-            var touchcode = api.MapPointsToTouchcode(touchpoints);
+			var touchcode = referenceSystem.MapPointsToTouchcode(touchpoints).Value;
 
             // Assert
-            Assert.AreEqual(touchcode, 0xFFF);
+            Assert.AreEqual(0xFFF, touchcode);
         }
 
         [Test]
@@ -243,10 +244,10 @@ namespace TangibleTouch.Tests
             };
 
             // System Under Test
-            var api = new TouchcodeAPI();
+			var referenceSystem = new ReferenceSystem(new Point2D(0, 0), new Vector2D(3, 0), new Vector2D(0, 3));
 
             // Act
-            var touchcode = api.MapPointsToTouchcode(touchpoints);
+			var touchcode = referenceSystem.MapPointsToTouchcode(touchpoints).Value;
 
             // Assert
             Assert.AreEqual(touchcode, 0x18);
@@ -262,11 +263,11 @@ namespace TangibleTouch.Tests
                     new Point2D(2.0, 0.0)
             };
 
-            // System Under Test
-            var api = new TouchcodeAPI();
+			// System Under Test
+			var referenceSystem = new ReferenceSystem(new Point2D(0, 0), new Vector2D(3, 0), new Vector2D(0, 3));
 
-            // Act
-            var touchcode = api.MapPointsToTouchcode(touchpoints);
+			// Act
+			var touchcode = referenceSystem.MapPointsToTouchcode(touchpoints).Value;
 
             // Assert
             Assert.AreEqual(touchcode, 0x888);
@@ -282,11 +283,11 @@ namespace TangibleTouch.Tests
                     new Point2D(1.0, 0.1)
             };
 
-            // System Under Test
-            var api = new TouchcodeAPI();
+			// System Under Test
+			var referenceSystem = new ReferenceSystem(new Point2D(0, 0), new Vector2D(3, 0), new Vector2D(0, 3));
 
-            // Act
-            var touchcode = api.MapPointsToTouchcode(touchpoints);
+			// Act
+			var touchcode = referenceSystem.MapPointsToTouchcode(touchpoints).Value;
 
             // Assert
             Assert.AreEqual(touchcode, 0x444);
@@ -304,11 +305,11 @@ namespace TangibleTouch.Tests
                 new Point2D(x, y)
             };
 
-            // System Under Test
-            var api = new TouchcodeAPI();
+			// System Under Test
+			var referenceSystem = new ReferenceSystem(new Point2D(0, 0), new Vector2D(3, 0), new Vector2D(0, 3));
 
-            // Act
-            var touchcode = api.MapPointsToTouchcode(touchpoints);
+			// Act
+			var touchcode = referenceSystem.MapPointsToTouchcode(touchpoints).Value;
 
             // Assert
             Assert.AreEqual(touchcode, expectedTouchcode);

@@ -68,19 +68,16 @@ namespace TangibleTouch
 
 			var referenceSystem = ExtractReferenceSystemFrom(touchpoints);
 
-			if (referenceSystem.GetType() == typeof(InvalidReferenceSystem))
-			{
-				return Touchcode.None;
-			}
-
-			var touchcodeValue = MapPointsToTouchcode(touchpoints.Select(point => Normalize(referenceSystem, point)));
-
-			return new Touchcode(touchcodeValue, referenceSystem.Angle, referenceSystem.Origin);
+			return referenceSystem.MapPointsToTouchcode(touchpoints);
 		}
 
-
+		/// <summary>
+		/// From a list of touchpoints, determine if there are the 3 necessary points (origin, vx, vy) of our touchcode reference system.
+		/// </summary>
+		/// <returns>The extracted <see cref="ReferenceSystem"/> or an instance of <see cref="InvalidReferenceSystem"/> if none could be found.</returns>
 		public ReferenceSystem ExtractReferenceSystemFrom(IList<Point2D> touchPoints)
 		{
+			// find the combination of two points with the longest distence, call them v1 and v2
 			var longestDistance = touchPoints
 				.Combinations(2)
 				.Select(points => new Tuple<Point2D, Point2D, double>(points.ElementAt(0), points.ElementAt(1), points.ElementAt(0).DistanceTo(points.ElementAt(1))))
@@ -89,8 +86,12 @@ namespace TangibleTouch
 
 			var v1 = longestDistance.Item1;
 			var v2 = longestDistance.Item2;
+
+			// the expected leg length (=cathetus) of the triangle (origin, v1, v2) is longestDistance / sqrt(2)
 			var expectedLegLength = longestDistance.Item3 / Constants.Sqrt2;
 
+			// find the origin of the triangle by checking every point p whether v1 - p and v2 - p are perpendicular (angle = 90 degrees)
+			// AND the leg length is longestDistance / sqrt(2) in both cases
 			foreach (var point in touchPoints)
 			{
 				var pv1 = v1 - point;
@@ -98,7 +99,7 @@ namespace TangibleTouch
 
 				if (IsRightTriangle(pv1, pv2, expectedLegLength))
 				{
-					var axes = DetermineAxes(point, pv1, pv2);
+					var axes = DetermineAxes(pv1, pv2);
 					return new ReferenceSystem(point, axes.Item1, axes.Item2);
 				}
 			}
@@ -114,8 +115,11 @@ namespace TangibleTouch
 			return v1.IsPerpendicularTo(v2, maxAngleDeviation) && v1.LengthAlmostEqual(legLength, maxLegDeviation) && v2.LengthAlmostEqual(legLength, maxLegDeviation);
 		}
 
-
-		private Tuple<Vector2D, Vector2D> DetermineAxes(Point2D origin, Vector2D v1, Vector2D v2)
+		/// <summary>
+		/// Checks two vectors v1 and v2 whether v1 is vx and v2 is vy of the touchcode reference system (or vice versa)
+		/// by aligning them to the axes of the real coordinate system.
+		/// </summary>
+		private Tuple<Vector2D, Vector2D> DetermineAxes(Vector2D v1, Vector2D v2)
 		{
 			var positiveXAxis = new Vector2D(1, 0);
 			var positiveYAxis = new Vector2D(0, 1);
@@ -127,27 +131,7 @@ namespace TangibleTouch
 
 			return new Tuple<Vector2D, Vector2D>(vx, vy);
 		}
-
-		private Point2D Normalize(ReferenceSystem referenceSystem, Point2D point)
-		{
-			var oPoint = point - referenceSystem.Origin;
-
-			var xcor = referenceSystem.Vx.Normalize().DotProduct(oPoint / referenceSystem.Vx.Length) * 3;
-			var ycor = referenceSystem.Vy.Normalize().DotProduct(oPoint / referenceSystem.Vy.Length) * 3;
-			
-			return new Point2D(xcor, ycor);
-		}
-
-		public int MapPointsToTouchcode(IEnumerable<Point2D> touchPoints)
-		{
-			var threshold = 0.2001;
-			var touchcode = 0;
-
-			_touchpointMap.ToList().ForEach(map => touchcode |= touchPoints.Any(tp => tp.AlmostEqual(map.Key, threshold)) ? map.Value : 0);
-
-			return touchcode;
-		}
-
+	
 		public IList<Point2D> MirrorX(IEnumerable<Point2D> touchPoints, int maxY = 1080)
 		{
 			return touchPoints.Select(point => new Point2D(point.X, maxY - point.Y)).ToList();
@@ -160,34 +144,6 @@ namespace TangibleTouch
 			touchpoints.ForEach(p => builder.AppendFormat("({0},{1}){2}", p.Position.X, p.Position.Y, p.Equals(touchpoints.Last()) ? "" : ","));
 
 			return builder.Append("]").ToString();
-		}
-	}
-
-	public class ReferenceSystem
-	{
-		public Point2D Origin { get; protected set; }
-
-		public Vector2D Vx { get; protected set; }
-
-		public Vector2D Vy { get; protected set; }
-
-		public double Angle { get; protected set; }
-
-		public ReferenceSystem(Point2D origin, Vector2D vx, Vector2D vy)
-		{
-			Origin = origin;
-			Vx = vx;
-			Vy = vy;
-			Angle = Vy.SignedAngleTo(new Vector2D(0, 1), false, false).Degrees;
-		}
-	}
-
-	public class InvalidReferenceSystem : ReferenceSystem
-	{
-		public InvalidReferenceSystem()
-			: base(new Point2D(-1, -1), new Vector2D(-1, -1), new Vector2D(-1, -1))
-		{
-
 		}
 	}
 

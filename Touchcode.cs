@@ -39,7 +39,6 @@ namespace TangibleTouch
 			Origin = origin;
 		}
 
-
 		/// <summary>
 		/// Creates a formatted string with the Touchcode value in hex and the angle of the Touchcode 
 		/// or '[None]' if the Touchcode is Touchcode.None.
