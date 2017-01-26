@@ -109,7 +109,10 @@ namespace TangibleTouch
 
 		private bool IsRightTriangle(Vector2D v1, Vector2D v2, double legLength)
 		{
+			// 8% deviation for leg lengths
 			double maxLegDeviation = 0.08;
+
+			// 5 degrees max deviation (85 - 95 degrees between v1 and v2)
 			double maxAngleDeviation = 5.001;
 
 			return v1.IsPerpendicularTo(v2, maxAngleDeviation) && v1.LengthAlmostEqual(legLength, maxLegDeviation) && v2.LengthAlmostEqual(legLength, maxLegDeviation);
