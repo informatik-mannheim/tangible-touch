@@ -1,26 +1,25 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Shapes;
 using TangibleTouch;
-using System.Linq;
 using Path = System.IO.Path;
-using System.Windows.Media;
-using System.Windows.Controls;
 
 namespace WpfTouchFrameSample
 {
 	public partial class MainWindow : Window
 	{
-		private List<TouchPoint> _touchPointList = new List<TouchPoint>();
+		private List<TouchDevice> _capturedTouchDevices = new List<TouchDevice>();
 
 		private Touchcode _currentTouchcode;
 		private TouchcodeAPI _touchcodeAPI;
-
-		private Polygon _polygon;
+		
 		private Canvas _canvas;
 
 		public MainWindow()
@@ -29,68 +28,56 @@ namespace WpfTouchFrameSample
 
 			_touchcodeAPI = new TouchcodeAPI();
 			_currentTouchcode = Touchcode.None;
+			_canvas = CreateTouchcodeVisualization();
+			
+			canvas.Children.Add(_canvas);
 
 			Redraw();
-
-			_canvas = CreateTouchcodeVisualization();
-			canvas.Children.Add(_canvas);
-		}
-
-		private void RenderTouchcodeVisualization()
-		{
-			if (_currentTouchcode != Touchcode.None)
-			{
-				for (int i = 0; i < 12; i++)
-				{
-					_canvas.Children[i].Visibility = (_currentTouchcode.Value & 1 << i) == 1 << i ? Visibility.Visible : Visibility.Hidden;
-				}
-
-				_canvas.RenderTransform = new RotateTransform(_currentTouchcode.Angle, 1800, 150);
-			}
 		}
 
 		private void Redraw()
 		{
 			RenderTouchcodeVisualization();
-			xaml_touchpoints.Text = String.Format("{0} TouchPoints @ {1}", _touchPointList.Count, _touchcodeAPI.Serialize(_touchPointList));
+			xaml_touchpoints.Text = String.Format("{0} TouchPoints @ {1}", _capturedTouchDevices.Count, _touchcodeAPI.Serialize(GetTouchpoints()));
 			xaml_touchcode_value.Text = _currentTouchcode.ToString();
+		}
+
+		private void RenderTouchcodeVisualization()
+		{
+			for (int i = 0; i < 12; i++)
+			{
+				_canvas.Children[i].Visibility = (_currentTouchcode.Value & 1 << i) == 1 << i ? Visibility.Visible : Visibility.Hidden;
+			}
+
+			if (_currentTouchcode != Touchcode.None)
+			{
+				_canvas.RenderTransform = new RotateTransform(_currentTouchcode.Angle, 1800, 150);
+			}
 		}
 
 		void OnTouchDown(object sender, TouchEventArgs e)
 		{
 			grid.CaptureTouch(e.TouchDevice);
 
-			_touchPointList.Add(e.TouchDevice.GetTouchPoint(grid));
-			_touchPointList.OrderBy(t => t.TouchDevice);
-
-			_currentTouchcode = _touchcodeAPI.Check(_touchPointList);
+			_capturedTouchDevices.Add(e.TouchDevice);
+			_currentTouchcode = _touchcodeAPI.Check(GetTouchpoints());
 			
 			Redraw();
 		}
 
 		void OnTouchMove(object sender, TouchEventArgs e)
 		{
-			var p = _touchPointList.Where(tp => tp.TouchDevice.Equals(e.TouchDevice)).First();
-			
-			_touchPointList.Remove(p);
-
-			_touchPointList.Add(e.GetTouchPoint(grid));
-			_touchPointList.OrderBy(t => t.TouchDevice);
-
-			_currentTouchcode = _touchcodeAPI.Check(_touchPointList);
+			_currentTouchcode = _touchcodeAPI.Check(GetTouchpoints());
 
 			Redraw();
 		}
 
 		void OnTouchUp(object sender, TouchEventArgs e)
 		{
-			var touchpoint = e.GetTouchPoint(grid);
-
-			_touchPointList.RemoveAll(p => p.TouchDevice == touchpoint.TouchDevice);
-			_touchPointList.OrderBy(t => t.TouchDevice);
-			_currentTouchcode = _touchcodeAPI.Check(_touchPointList);
-
 			grid.ReleaseTouchCapture(e.TouchDevice);
+
+			_capturedTouchDevices.RemoveAll(td => td == e.TouchDevice);
+			_currentTouchcode = _touchcodeAPI.Check(GetTouchpoints());
 
 			Redraw();
 		}
@@ -108,7 +95,7 @@ namespace WpfTouchFrameSample
 		{
 			using (StreamWriter file = new StreamWriter(String.Format(@"{0}/touchcode_log.txt", Path.GetTempPath()), true))
 			{
-				file.WriteLine(_touchcodeAPI.Serialize(_touchPointList));
+				file.WriteLine(_touchcodeAPI.Serialize(GetTouchpoints()));
 			}
 		}
 
@@ -176,6 +163,11 @@ namespace WpfTouchFrameSample
 			polygon.Points.Add(point);
 			polygon.Points.Add(point);
 			return polygon;
+		}
+
+		private List<TouchPoint> GetTouchpoints()
+		{
+			return _capturedTouchDevices.Select(td => td.GetTouchPoint(grid)).ToList();
 		}
 	}
 }
