@@ -5,7 +5,7 @@
         FontFamily ="./Fonts/#Press Start 2P"
         KeyDown="OnKeyDown">
 
-    <Grid x:Name="grid" TouchDown="OnTouchDown" TouchUp="OnTouchUp" Width="59.77265033600158cm" Height="33.6221158140009cm" Background="#F57C00">
+    <Grid x:Name="grid" TouchMove="OnTouchMove" TouchDown="OnTouchDown" TouchUp="OnTouchUp" Width="59.77265033600158cm" Height="33.6221158140009cm" Background="#F57C00">
         <Canvas x:Name="canvas" Background="Transparent" Panel.ZIndex="1000" />
         <TextBox x:Name="xaml_touchcode_label" FontSize="30" Margin="10,5,1743.124,1201.757" Background="Transparent"  BorderThickness="0" >>>Touchcode:</TextBox>
         <TextBox x:Name="xaml_touchcode_value" FontSize="30" Margin="389,5,1246.124,1201.757" Width="1920" Background="Transparent" BorderThickness="0">[None]</TextBox>
