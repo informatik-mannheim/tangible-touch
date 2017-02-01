@@ -5,7 +5,7 @@ obj/
 python/build/
 __pycache__
 .ipynb_checkpoints/
-
+StyleCop.Cache
 
 # NuGet Packages
 *.nupkg
