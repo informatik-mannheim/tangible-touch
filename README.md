@@ -14,7 +14,7 @@ The `xMirror` flag should be set to `true` if y-coordinates of the screen start 
 
 A more general way to check for Touchcodes that does not rely on WPF can be used like this:
 
-```
+```C#
 public Touchcode Check(IList<Point2D> touchpoints, bool xMirror = true, int maxY = 1080)
 ```
 
