@@ -6,7 +6,7 @@ The code is written to work with .NET Framework >= 4.5 and references the Math.N
 
 # Quickstart
 Given a list of TouchPoint instances from WPF, call this API function:
-```
+```C#
 public Touchcode Check(IList<TouchPoint> touchPoints, bool xMirror = true, int maxY = 1080)
 ``` 
 
