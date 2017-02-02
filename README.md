@@ -10,7 +10,7 @@ Given a list of TouchPoint instances from WPF, call this API function:
 public Touchcode Check(IList<TouchPoint> touchPoints, bool xMirror = true, int maxY = 1080)
 ``` 
 
-The `xMirror` flag should be set to `true` if y-coordinates of the screen start counting at the top of the screen. Additionally, `maxY` tells the system how many pixels the screen width is.
+The `xMirror` flag should be set to `true` if y-coordinates of the screen start counting at the top of the screen. Additionally, `maxY` tells the system how many pixels the screen height is.
 
 A more general way to check for Touchcodes that does not rely on WPF can be used like this:
 
